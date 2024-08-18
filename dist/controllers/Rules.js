@@ -14,7 +14,7 @@ const AddPermissions = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!permission || !role) {
             return res.status(400).json({ message: "Provide all fields" });
         }
-        yield Role.findOneAndUpdate({ role: role }, { $push: { permissions: permission } });
+        yield Role.findOneAndUpdate({ role: role }, { $addToSet: { permissions: permission } });
         res.status(200).json({ message: "Permission added successfully" });
     }
     catch (error) {

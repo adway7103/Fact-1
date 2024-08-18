@@ -30,13 +30,21 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 export const updateItemQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { item_id, quantity, user_id } = req.body;
-        if (!item_id || !quantity) {
-            return res.status(400).json({ error: "Please provide all fields" });
+        const { item_id, quantity, min_limit, user_id } = req.body;
+        if (!item_id) {
+            return res.status(400).json({ error: "Please proide item Id" });
         }
-        const item = yield Inventory.findByIdAndUpdate(item_id, {
-            quantity: quantity,
-        });
+        if (!quantity && !min_limit) {
+            return res.status(400).json({ error: "Please provide quantity or min_limit" });
+        }
+        const updateFields = { quantity: quantity };
+        if (quantity !== undefined) {
+            updateFields.quantity = quantity;
+        }
+        if (min_limit !== undefined) {
+            updateFields.min_limit = min_limit;
+        }
+        const item = yield Inventory.findByIdAndUpdate(item_id, updateFields, { new: true });
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
         }
@@ -48,6 +56,22 @@ export const updateItemQuantity = (req, res) => __awaiter(void 0, void 0, void 0
             });
         }
         return res.status(200).json({ message: "Item Quantity updated" });
+    }
+    catch (error) {
+        return res.status(400).json({ message: "Error occured" });
+    }
+});
+export const deleteItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { item_id } = req.body;
+        if (!item_id) {
+            return res.status(400).json({ error: "Please provide all fields" });
+        }
+        const item = yield Inventory.findByIdAndDelete(item_id);
+        if (!item) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+        return res.status(200).json({ message: "Item deleted" });
     }
     catch (error) {
         return res.status(400).json({ message: "Error occured" });

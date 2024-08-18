@@ -12,7 +12,7 @@ const AddPermissions = async (req: Request, res: Response) => {
 
     await Role.findOneAndUpdate(
       { role: role },
-      { $push: { permissions: permission } }
+      { $addToSet: { permissions: permission } }
     );
 
     res.status(200).json({ message: "Permission added successfully" });
