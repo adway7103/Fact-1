@@ -8,17 +8,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Role from "../models/Role.js";
+import { UserType } from "../models/User.js";
 const AddPermissions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { permission, role } = req.body;
         if (!permission || !role) {
             return res.status(400).json({ message: "Provide all fields" });
         }
-        yield Role.findOneAndUpdate({ role: role }, { $addToSet: { permissions: permission } });
-        res.status(200).json({ message: "Permission added successfully" });
+        // Convert the role to lowercase to match the UserType enum
+        const mappedRole = Object.values(UserType).find((userType) => userType.toLowerCase() === role.toLowerCase());
+        if (!mappedRole) {
+            return res.status(400).json({ message: "Invalid role" });
+        }
+        const existingRole = yield Role.findOne({ role: mappedRole });
+        if (existingRole) {
+            yield Role.findOneAndUpdate({ role: mappedRole }, { $addToSet: { permissions: permission } });
+            return res.status(200).json({ message: "Permission added successfully" });
+        }
+        else {
+            const newRole = new Role({
+                role: mappedRole,
+                permissions: [permission],
+            });
+            yield newRole.save();
+            return res.status(201).json({ message: "Role created and permission added successfully" });
+        }
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 });
 export default AddPermissions;

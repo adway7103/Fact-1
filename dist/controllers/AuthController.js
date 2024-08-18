@@ -10,12 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { UserType } from "../models/User.js";
 export const registerC = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, username, password, phoneNo, userType } = req.body;
-        // console.log(req.body);
         if (!name || !username || !password || !phoneNo || !userType) {
             return res.status(400).json({ error: "Please enter all fields" });
+        }
+        // Map the string userType to the corresponding UserType enum
+        const mappedUserType = Object.values(UserType).find((type) => type.toLowerCase() === userType.toLowerCase());
+        if (!mappedUserType) {
+            return res.status(400).json({ error: "Invalid user type" });
         }
         const existing = yield User.findOne({ username }).lean();
         if (existing) {
@@ -28,7 +33,7 @@ export const registerC = (req, res) => __awaiter(void 0, void 0, void 0, functio
             username,
             password: hashedPassword,
             phoneNo,
-            userType,
+            userType: mappedUserType, // Use the mapped UserType
         });
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "30d",

@@ -2,8 +2,10 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 const authenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
+    console.log(authHeader);
     const token = authHeader.split(" ")[1];
     if (!token) {
+        console.log("1");
         return res.status(401).json({ error: "Unauthorized" });
     }
     try {

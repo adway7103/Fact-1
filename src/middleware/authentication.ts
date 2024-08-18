@@ -7,8 +7,10 @@ interface User {
 
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const authHeader: any = req.headers.authorization;
+  console.log(authHeader)
   const token = authHeader.split(" ")[1];
   if (!token) {
+    console.log("1")
     return res.status(401).json({ error: "Unauthorized" });
   }
   try {

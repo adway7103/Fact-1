@@ -6,6 +6,9 @@ import TodoRouter from "./routes/TodoRouter.js";
 import authenticate from "./middleware/authentication.js";
 import inventoryRouter from "./routes/Inventory.js";
 import cors from "cors";
+import AddPermissions from "./controllers/Rules.js";
+// import roleRouter from "./routes/RoleRouter.js";
+import roleRouter from "./routes/RoleRouter.js";
 import { checkPermissions } from "./middleware/checkPermissions.js";
 
 const app = express();
@@ -15,6 +18,8 @@ app.use(cors());
 app.use("/auth", authRouter);
 app.use("/todo",authenticate, TodoRouter);
 app.use("/inventory",authenticate ,inventoryRouter);
+// app.use("/role",authenticate,checkPermissions("add-role"), roleRouter);
+app.post("/role", AddPermissions) ;
 
 app.get("/", (req, res) => {
   res.send("Welcome to Fact-1 Api");

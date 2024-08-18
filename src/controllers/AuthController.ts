@@ -2,13 +2,23 @@ import User from "../models/User.js";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { UserType } from "../models/User.js";
 
 export const registerC = async (req: Request, res: Response) => {
   try {
     const { name, username, password, phoneNo, userType } = req.body;
-    // console.log(req.body);
+
     if (!name || !username || !password || !phoneNo || !userType) {
       return res.status(400).json({ error: "Please enter all fields" });
+    }
+
+    // Map the string userType to the corresponding UserType enum
+    const mappedUserType = Object.values(UserType).find(
+      (type) => type.toLowerCase() === userType.toLowerCase()
+    );
+
+    if (!mappedUserType) {
+      return res.status(400).json({ error: "Invalid user type" });
     }
 
     const existing = await User.findOne({ username }).lean();
@@ -23,10 +33,10 @@ export const registerC = async (req: Request, res: Response) => {
       name,
       username,
       password: hashedPassword,
-
       phoneNo,
-      userType,
+      userType: mappedUserType, // Use the mapped UserType
     });
+
     const token = jwt.sign(
       { _id: user._id },
       process.env.JWT_SECRET as string,

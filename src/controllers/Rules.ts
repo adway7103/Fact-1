@@ -10,14 +10,33 @@ const AddPermissions = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Provide all fields" });
     }
 
-    await Role.findOneAndUpdate(
-      { role: role },
-      { $addToSet: { permissions: permission } }
+    // Convert the role to lowercase to match the UserType enum
+    const mappedRole = Object.values(UserType).find(
+      (userType) => userType.toLowerCase() === role.toLowerCase()
     );
 
-    res.status(200).json({ message: "Permission added successfully" });
+    if (!mappedRole) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    const existingRole = await Role.findOne({ role: mappedRole });
+
+    if (existingRole) {
+      await Role.findOneAndUpdate(
+        { role: mappedRole },
+        { $addToSet: { permissions: permission } }
+      );
+      return res.status(200).json({ message: "Permission added successfully" });
+    } else {
+      const newRole = new Role({
+        role: mappedRole,
+        permissions: [permission],
+      });
+      await newRole.save();
+      return res.status(201).json({ message: "Role created and permission added successfully" });
+    }
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
