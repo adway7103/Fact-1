@@ -7,16 +7,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Todo1 from "../models/Todo1.js";
-import Todo2 from "../models/Todo2.js";
+import Todo from "../models/Todo.js";
+import { TodoType } from "../models/Todo.js";
 export const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, description, user_id } = req.body;
-        const task = yield Todo1.create({
+        const { title, description, user_id, todo_type } = req.body;
+        // Validate todo_type
+        if (!Object.values(TodoType).includes(todo_type)) {
+            return res.status(400).json({ error: "Invalid todo type" });
+        }
+        const task = yield Todo.create({
             title,
             description,
             status: false,
             user: user_id,
+            todo_type: todo_type,
         });
         return res.status(201).json({ task });
     }
@@ -24,59 +29,37 @@ export const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.status(400).json({ error: error.message });
     }
 });
-export const addTask2 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const getAllTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, description, user_id } = req.body;
-        const task = yield Todo2.create({
-            title,
-            description,
-            status: false,
-            user: user_id,
-        });
-        return res.status(201).json({ task });
+        const tasks = yield Todo.find({});
+        return res.status(200).json({ tasks });
     }
     catch (error) {
-        return res.status(400).json({ error: error.message });
+        return res.status(500).json({ message: "Internal server error" });
     }
 });
-export const updateStatus1 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { user_id, task_id } = req.body;
-        const updatedTask = yield Todo1.findByIdAndUpdate(task_id, {
-            status: true,
-        });
-        return res.status(200).json({ message: "Updated successfully" });
-    }
-    catch (error) {
-        return res.status(500).json({ error: "Internal server error" });
-    }
-});
-export const updateStatus2 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { user_id, task_id } = req.body;
-        const updatedTask = yield Todo2.findByIdAndUpdate(task_id, {
-            status: true,
-        });
-        return res.status(200).json({ message: "Updated successfully" });
-    }
-    catch (error) {
-        return res.status(500).json({ error: "Internal server error" });
-    }
-});
-export const deleteTask1 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { task_id } = req.body;
-        yield Todo1.findByIdAndDelete(task_id);
-        return res.status(200).json({ message: "Deleted successfully" });
+        const updatedTask = yield Todo.findByIdAndUpdate(task_id, {
+            status: true,
+        }, { new: true });
+        if (!updatedTask) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+        return res.status(200).json({ message: "Updated successfully", updatedTask });
     }
     catch (error) {
         return res.status(500).json({ error: "Internal server error" });
     }
 });
-export const deleteTask2 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { task_id } = req.body;
-        yield Todo2.findByIdAndDelete(task_id);
+        const deletedTask = yield Todo.findByIdAndDelete(task_id);
+        if (!deletedTask) {
+            return res.status(404).json({ message: "Task not found" });
+        }
         return res.status(200).json({ message: "Deleted successfully" });
     }
     catch (error) {

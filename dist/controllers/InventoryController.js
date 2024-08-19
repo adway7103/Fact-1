@@ -12,7 +12,7 @@ import Alerts from "../models/Alerts.js";
 export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, quantity, price, min_limit, image_url } = req.body;
-        if (!name || !quantity || !price || min_limit || image_url) {
+        if (!name || !quantity || !price || !min_limit || !image_url) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
         const item = yield Inventory.create({

@@ -6,7 +6,7 @@ import { Request, Response } from "express";
 export const addItem = async (req: Request, res: Response) => {
   try {
     const { name, quantity, price, min_limit, image_url } = req.body;
-    if (!name || !quantity || !price || min_limit || image_url) {
+    if (!name || !quantity || !price || !min_limit || !image_url) {
       return res.status(400).json({ error: "Please enter all fields" });
     }
     const item = await Inventory.create({

@@ -80,3 +80,21 @@ export const loginC = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(500).json({ error: error.message });
     }
 });
+export const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name, username, phoneNo, userType } = req.body;
+        const user = yield User.findById(req.params.id);
+        if (user) {
+            user.name = name || user.name;
+            user.username = username || user.username;
+            user.phoneNo = phoneNo || user.phoneNo;
+            user.userType = userType || user.userType;
+            yield user.save();
+            return res.status(200).json({ user });
+        }
+        return res.status(404).json({ error: "User not found" });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});

@@ -95,3 +95,24 @@ export const loginC = async (req: Request, res: Response) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+export const editUser = async (req: Request, res: Response) => {
+  try {
+    const { name, username, phoneNo, userType } = req.body;
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.name = name || user.name;
+      user.username = username || user.username;
+      user.phoneNo = phoneNo || user.phoneNo;
+      user.userType = userType || user.userType;
+
+      await user.save();
+      return res.status(200).json({ user });
+    }
+    return res.status(404).json({ error: "User not found" });
+    
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+    
+  }
+}

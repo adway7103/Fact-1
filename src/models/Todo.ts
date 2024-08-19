@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 
-const Todo1Schema = new mongoose.Schema({
+export enum TodoType {
+    Todo1 = "todo1",
+    Todo2 = "todo2",
+    Todo3 = "todo3",
+  }
+
+const TodoSchema = new mongoose.Schema({
     title:{
         type: String,
         required: true
@@ -16,8 +22,15 @@ const Todo1Schema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+    todo_type: {
+        type: String,
+        required: true,
+        enum: TodoType,
+        default: TodoType.Todo1
     }
+
 
 })
 
-export default mongoose.model("Todo1", Todo1Schema);
+export default mongoose.model("Todo", TodoSchema);
