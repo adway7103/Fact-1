@@ -98,3 +98,12 @@ export const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(500).json({ error: error.message });
     }
 });
+export const fetchUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield User.find();
+        return res.status(200).json({ users });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
