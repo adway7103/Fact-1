@@ -6,7 +6,7 @@ import { CheckPrimeOptions } from "crypto";
 import { checkPermissions } from "../middleware/checkPermissions.js";
 import authenticate from "../middleware/authentication.js";
 router.post("/add-user", authenticate,checkPermissions("add-user"), registerC);
-router.get("/fetch-users", authenticate,checkPermissions("fetch-users"), fetchUsers);
+router.get("/fetch-users", authenticate, fetchUsers);
 router.put("/edit-user/:id", authenticate,checkPermissions("edit-user"), editUser);
 // router.post("/add-user", registerC);
 
