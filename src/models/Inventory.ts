@@ -12,6 +12,7 @@ interface Inventory extends mongoose.Document {
   price: number;
   min_limit: number;
   image_url: string;
+  inventory_type: InventoryType;
 }
 
 const InventorySchema = new mongoose.Schema<Inventory>({
@@ -29,6 +30,12 @@ const InventorySchema = new mongoose.Schema<Inventory>({
   },
   image_url: {
     type: String,
+  },
+  inventory_type: {
+    type: String,
+    required: true,
+    enum: Object.values(InventoryType),
+    default: InventoryType.Raw,
   },
 });
 

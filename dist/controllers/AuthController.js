@@ -107,3 +107,17 @@ export const fetchUsers = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return res.status(500).json({ error: error.message });
     }
 });
+export const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { user_id } = req.body;
+        const user = yield User.findById(user_id);
+        if (user) {
+            return res.status(200).json({ user });
+        }
+        return res.status(404).json({ error: "User not found" });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
+});

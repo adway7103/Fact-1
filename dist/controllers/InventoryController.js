@@ -9,11 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import Inventory from "../models/Inventory.js";
 import Alerts from "../models/Alerts.js";
+import { InventoryType } from "../models/Inventory.js";
+export const getItems = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const items = yield Inventory.find();
+        return res.status(200).json({ items });
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+});
 export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, quantity, price, min_limit, image_url } = req.body;
-        if (!name || !quantity || !price || !min_limit || !image_url) {
+        const { name, quantity, price, min_limit, image_url, inventory_type } = req.body;
+        if (!name || !quantity || !price || !min_limit || !image_url || !inventory_type) {
             return res.status(400).json({ error: "Please enter all fields" });
+        }
+        const mappedInventoryType = Object.values(InventoryType).find((type) => type.toLowerCase() === inventory_type.toLowerCase());
+        if (!mappedInventoryType) {
+            return res.status(400).json({ error: "Invalid inventory type" });
         }
         const item = yield Inventory.create({
             name,
@@ -21,6 +35,7 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
             price,
             min_limit,
             image_url,
+            inventory_type: mappedInventoryType,
         });
         return res.status(201).json({ item });
     }

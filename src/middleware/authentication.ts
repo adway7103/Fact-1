@@ -8,14 +8,19 @@ interface User {
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader: any = req.headers.authorization;
-    console.log(authHeader)
+    if(!authHeader){
+      return res.status(401).json({ error: "Unauthorized" });
+    }
     const token = authHeader.split(" ")[1];
     if (!token) {
-      console.log("1")
+      console.log("1");
       return res.status(401).json({ error: "Unauthorized" });
     }
     try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET as string) as User;
+      const payload = jwt.verify(
+        token,
+        process.env.JWT_SECRET as string
+      ) as User;
       req.body.user_id = payload._id;
       next();
     } catch (error) {
@@ -27,12 +32,9 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({ error: "Internal server error" }); // Handle unexpected errors
       }
     }
-    
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
-    
   }
-
 };
 
 export default authenticate;

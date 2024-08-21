@@ -22,5 +22,11 @@ const InventorySchema = new mongoose.Schema({
     image_url: {
         type: String,
     },
+    inventory_type: {
+        type: String,
+        required: true,
+        enum: Object.values(InventoryType),
+        default: InventoryType.Raw,
+    },
 });
 export default mongoose.model("Inventory", InventorySchema);

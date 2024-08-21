@@ -1,20 +1,39 @@
 import Inventory from "../models/Inventory.js";
 import Alerts from "../models/Alerts.js";
-
+import { InventoryType } from "../models/Inventory.js";
 import { Request, Response } from "express";
+
+export const getItems = async (req: Request, res: Response) => {
+  try {
+    const items = await Inventory.find();
+    return res.status(200).json({ items });
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
+  }
+}
 
 export const addItem = async (req: Request, res: Response) => {
   try {
-    const { name, quantity, price, min_limit, image_url } = req.body;
-    if (!name || !quantity || !price || !min_limit || !image_url) {
+    const { name, quantity, price, min_limit, image_url, inventory_type } = req.body;
+    if (!name || !quantity || !price || !min_limit || !image_url || !inventory_type) {
       return res.status(400).json({ error: "Please enter all fields" });
     }
+    const mappedInventoryType = Object.values(InventoryType).find(
+      (type) => type.toLowerCase() === inventory_type.toLowerCase()
+    );
+
+    if (!mappedInventoryType) {
+      return res.status(400).json({ error: "Invalid inventory type" });
+    }
+
     const item = await Inventory.create({
       name,
       quantity,
       price,
       min_limit,
       image_url,
+      inventory_type: mappedInventoryType,
+
     });
     return res.status(201).json({ item });
   } catch (error: any) {
