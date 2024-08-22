@@ -31,7 +31,8 @@ export const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 export const getAllTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const tasks = yield Todo.find({});
+        const { user_id } = req.body;
+        const tasks = yield Todo.find({ user: user_id });
         return res.status(200).json({ tasks });
     }
     catch (error) {

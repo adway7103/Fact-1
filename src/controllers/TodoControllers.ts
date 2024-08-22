@@ -27,7 +27,8 @@ export const addTask = async (req: Request, res: Response) => {
 
 export const getAllTasks = async (req: Request, res: Response) => {
   try {
-    const tasks = await Todo.find({});
+    const {user_id} = req.body;
+    const tasks = await Todo.find({ user: user_id });
     return res.status(200).json({ tasks });
   } catch (error: any) {
     return res.status(500).json({ message: "Internal server error" });
