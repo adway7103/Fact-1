@@ -35,6 +35,8 @@ export const getAllTasks = async (req: Request, res: Response) => {
   }
 };
 
+
+
 export const updateStatus = async (req: Request, res: Response) => {
   try {
     const { task_id } = req.body;
@@ -54,15 +56,27 @@ export const updateStatus = async (req: Request, res: Response) => {
 
 export const deleteTask = async (req: Request, res: Response) => {
   try {
-    const { task_id } = req.body;
-    const deletedTask = await Todo.findByIdAndDelete(task_id);
+    const { task_id, user_id } = req.body;
 
-    if (!deletedTask) {
+    // Find the task by its ID
+    const task:any = await Todo.findById(task_id);
+
+    // Check if the task exists
+    if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
+
+    // Check if the user ID matches the task's user ID
+    if (task.user.toString() !== user_id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Delete the task
+    await task.remove();
 
     return res.status(200).json({ message: "Deleted successfully" });
   } catch (error: any) {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+

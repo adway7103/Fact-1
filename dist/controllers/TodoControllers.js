@@ -56,11 +56,19 @@ export const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 export const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { task_id } = req.body;
-        const deletedTask = yield Todo.findByIdAndDelete(task_id);
-        if (!deletedTask) {
+        const { task_id, user_id } = req.body;
+        // Find the task by its ID
+        const task = yield Todo.findById(task_id);
+        // Check if the task exists
+        if (!task) {
             return res.status(404).json({ message: "Task not found" });
         }
+        // Check if the user ID matches the task's user ID
+        if (task.user.toString() !== user_id) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        // Delete the task
+        yield task.remove();
         return res.status(200).json({ message: "Deleted successfully" });
     }
     catch (error) {

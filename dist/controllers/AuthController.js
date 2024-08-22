@@ -121,3 +121,16 @@ export const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.status(500).json({ error: error.message });
     }
 });
+export const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { delete_user_id } = req.body;
+        const deletedUser = yield User.findByIdAndDelete(delete_user_id);
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ message: "Deleted successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
