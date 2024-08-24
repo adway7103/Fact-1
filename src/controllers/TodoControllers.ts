@@ -1,6 +1,7 @@
 import Todo from "../models/Todo.js";
 import { Request, Response } from "express";
 import { TodoType } from "../models/Todo.js";
+import mongoose from "mongoose";
 
 export const addTask = async (req: Request, res: Response) => {
   try {
@@ -27,7 +28,7 @@ export const addTask = async (req: Request, res: Response) => {
 
 export const getAllTasks = async (req: Request, res: Response) => {
   try {
-    const {user_id} = req.body;
+    const { user_id } = req.body;
     const tasks = await Todo.find({ user: user_id });
     return res.status(200).json({ tasks });
   } catch (error: any) {
@@ -35,20 +36,24 @@ export const getAllTasks = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const updateStatus = async (req: Request, res: Response) => {
   try {
     const { task_id } = req.body;
-    const updatedTask = await Todo.findByIdAndUpdate(task_id, {
-      status: true,
-    }, { new: true });
+    const updatedTask = await Todo.findByIdAndUpdate(
+      task_id,
+      {
+        status: true,
+      },
+      { new: true }
+    );
 
     if (!updatedTask) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ message: "Updated successfully", updatedTask });
+    return res
+      .status(200)
+      .json({ message: "Updated successfully", updatedTask });
   } catch (error: any) {
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -58,25 +63,25 @@ export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { task_id, user_id } = req.body;
 
-    // Find the task by its ID
-    const task:any = await Todo.findById(task_id);
-
-    // Check if the task exists
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
+    if (!task_id || !user_id) {
+      return res
+        .status(400)
+        .json({ message: "Task ID and User ID are required" });
     }
 
-    // Check if the user ID matches the task's user ID
-    if (task.user.toString() !== user_id) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!mongoose.Types.ObjectId.isValid(task_id)) {
+      return res.status(400).json({ message: "Invalid Task ID" });
     }
 
-    // Delete the task
-    await task.remove();
+    const dl = await Todo.findOneAndDelete({ _id: task_id, user: user_id });
+    if (!dl) {
+      return res
+        .status(400)
+        .json({ message: "No task found or unauthorized ti delete" });
+    }
 
     return res.status(200).json({ message: "Deleted successfully" });
   } catch (error: any) {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
