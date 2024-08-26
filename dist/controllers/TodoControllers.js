@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import Todo from "../models/Todo.js";
 import { TodoType } from "../models/Todo.js";
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 export const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title, description, user_id, todo_type } = req.body;
@@ -49,7 +49,9 @@ export const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!updatedTask) {
             return res.status(404).json({ message: "Task not found" });
         }
-        return res.status(200).json({ message: "Updated successfully", updatedTask });
+        return res
+            .status(200)
+            .json({ message: "Updated successfully", updatedTask });
     }
     catch (error) {
         return res.status(500).json({ error: "Internal server error" });
@@ -58,30 +60,23 @@ export const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
 export const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { task_id, user_id } = req.body;
-        // Validate task_id and user_id
         if (!task_id || !user_id) {
-            return res.status(400).json({ message: "Task ID and User ID are required" });
+            return res
+                .status(400)
+                .json({ message: "Task ID and User ID are required" });
         }
-        // Check if task_id is a valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(task_id)) {
             return res.status(400).json({ message: "Invalid Task ID" });
         }
         const dl = yield Todo.findOneAndDelete({ _id: task_id, user: user_id });
         if (!dl) {
-            return res.status(400).json({ message: "J" });
+            return res
+                .status(400)
+                .json({ message: "No task found or unauthorized ti delete" });
         }
-        // const task : any = await Todo.findById(task_id);
-        // if (!task) {
-        //   return res.status(404).json({ message: "Task not found" });
-        // }
-        // if (task.user.toString() !== user_id) {
-        //   return res.status(401).json({ message: "Unauthorized" });
-        // }
-        // await task.remove();
         return res.status(200).json({ message: "Deleted successfully" });
     }
     catch (error) {
-        console.error(error);
         return res.status(500).json({ error: "Internal server error" });
     }
 });
