@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import Inventory from "../models/Inventory.js";
 import Alerts from "../models/Alerts.js";
-import { InventoryType } from "../models/Inventory.js";
+import { InventoryType, RawSubCategory } from "../models/Inventory.js";
 export const getItems = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const items = yield Inventory.find();
@@ -19,15 +19,46 @@ export const getItems = (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(400).json({ error: error.message });
     }
 });
+export const updateRawSubcategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { item_id, sub_category } = req.body;
+        if (!item_id || !sub_category) {
+            return res.status(400).json({ error: "Please provide all fields" });
+        }
+        const mappedSubCategory = Object.values(RawSubCategory).find((category) => category.toLowerCase() === sub_category.toLowerCase());
+        if (!mappedSubCategory) {
+            return res.status(400).json({ error: "Invalid subcategory for raw inventory type" });
+        }
+        const item = yield Inventory.findByIdAndUpdate(item_id, { sub_category: mappedSubCategory }, { new: true });
+        if (!item) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+        return res.status(200).json({ message: "Item Subcategory updated" });
+    }
+    catch (error) {
+    }
+});
 export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, quantity, price, min_limit, image_url, inventory_type } = req.body;
+        const { name, quantity, price, min_limit, image_url, inventory_type, sub_category, extra_fields } = req.body;
         if (!name || !quantity || !price || !min_limit || !image_url || !inventory_type) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
         const mappedInventoryType = Object.values(InventoryType).find((type) => type.toLowerCase() === inventory_type.toLowerCase());
         if (!mappedInventoryType) {
             return res.status(400).json({ error: "Invalid inventory type" });
+        }
+        if (mappedInventoryType === InventoryType.Raw) {
+            if (!sub_category) {
+                return res.status(400).json({ error: "Subcategory is required for raw inventory type" });
+            }
+            const mappedSubCategory = Object.values(RawSubCategory).find((category) => category.toLowerCase() === sub_category.toLowerCase());
+            if (!mappedSubCategory) {
+                return res.status(400).json({ error: "Invalid subcategory for raw inventory type" });
+            }
+            if (extra_fields && !Array.isArray(extra_fields)) {
+                return res.status(400).json({ error: "Extra fields should be an array" });
+            }
         }
         const item = yield Inventory.create({
             name,
@@ -36,10 +67,13 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
             min_limit,
             image_url,
             inventory_type: mappedInventoryType,
+            sub_category: mappedInventoryType === InventoryType.Raw ? sub_category : undefined,
+            extra_fields: mappedInventoryType === InventoryType.Raw ? extra_fields : undefined,
         });
         return res.status(201).json({ item });
     }
     catch (error) {
+        console.log(error);
         return res.status(400).json({ error: error.message });
     }
 });

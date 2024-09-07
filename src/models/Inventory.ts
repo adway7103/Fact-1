@@ -6,6 +6,18 @@ export enum InventoryType {
   Cutting = "cutting",
   Ready = "ready",
 }
+
+export enum RawSubCategory {
+  Roll = "roll",
+  Astar = "astar",
+  Accessories = "accessories",
+}
+
+interface ExtraField {
+  key: string;
+  value: any;
+}
+
 interface Inventory extends mongoose.Document {
   name: string;
   quantity: number;
@@ -13,6 +25,8 @@ interface Inventory extends mongoose.Document {
   min_limit: number;
   image_url: string;
   inventory_type: InventoryType;
+  sub_category?: RawSubCategory;
+  extra_fields?: ExtraField[];
 }
 
 const InventorySchema = new mongoose.Schema<Inventory>({
@@ -36,6 +50,22 @@ const InventorySchema = new mongoose.Schema<Inventory>({
     required: true,
     enum: Object.values(InventoryType),
     default: InventoryType.Raw,
+  },
+  sub_category: {
+    type: String,
+    enum: Object.values(RawSubCategory),
+    required: function () {
+      return this.inventory_type === InventoryType.Raw;
+    },
+  },
+  extra_fields: {
+    type: [
+      {
+        key: String,
+        value: mongoose.Schema.Types.Mixed,
+      },
+    ],
+    required: false,
   },
 });
 
