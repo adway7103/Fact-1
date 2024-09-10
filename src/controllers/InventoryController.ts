@@ -86,6 +86,8 @@ export const addItem = async (req: Request, res: Response) => {
   }
 };
 
+
+
 export const updateItemQuantity = async (req: Request, res: Response) => {
   try {
     const { item_id, quantity, min_limit,user_id } = req.body;

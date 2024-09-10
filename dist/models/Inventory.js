@@ -42,12 +42,7 @@ const InventorySchema = new mongoose.Schema({
         },
     },
     extra_fields: {
-        type: [
-            {
-                key: String,
-                value: mongoose.Schema.Types.Mixed,
-            },
-        ],
+        type: [mongoose.Schema.Types.Mixed],
         required: false,
     },
 });
