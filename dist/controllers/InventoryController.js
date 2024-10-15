@@ -19,6 +19,16 @@ export const getItems = (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(400).json({ error: error.message });
     }
 });
+export const getRollItemById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const items = yield Inventory.findById(id);
+        return res.status(200).json({ items });
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+});
 export const updateRawSubcategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { item_id, sub_category } = req.body;
@@ -27,7 +37,9 @@ export const updateRawSubcategory = (req, res) => __awaiter(void 0, void 0, void
         }
         const mappedSubCategory = Object.values(RawSubCategory).find((category) => category.toLowerCase() === sub_category.toLowerCase());
         if (!mappedSubCategory) {
-            return res.status(400).json({ error: "Invalid subcategory for raw inventory type" });
+            return res
+                .status(400)
+                .json({ error: "Invalid subcategory for raw inventory type" });
         }
         const item = yield Inventory.findByIdAndUpdate(item_id, { sub_category: mappedSubCategory }, { new: true });
         if (!item) {
@@ -35,13 +47,17 @@ export const updateRawSubcategory = (req, res) => __awaiter(void 0, void 0, void
         }
         return res.status(200).json({ message: "Item Subcategory updated" });
     }
-    catch (error) {
-    }
+    catch (error) { }
 });
 export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, quantity, price, min_limit, image_url, inventory_type, sub_category, extra_fields } = req.body;
-        if (!name || !quantity || !price || !min_limit || !image_url || !inventory_type) {
+        const { name, quantity, price, min_limit, image_url, inventory_type, sub_category, extra_fields, } = req.body;
+        if (!name ||
+            !quantity ||
+            !price ||
+            !min_limit ||
+            !image_url ||
+            !inventory_type) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
         const mappedInventoryType = Object.values(InventoryType).find((type) => type.toLowerCase() === inventory_type.toLowerCase());
@@ -50,14 +66,20 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         if (mappedInventoryType === InventoryType.Raw) {
             if (!sub_category) {
-                return res.status(400).json({ error: "Subcategory is required for raw inventory type" });
+                return res
+                    .status(400)
+                    .json({ error: "Subcategory is required for raw inventory type" });
             }
             const mappedSubCategory = Object.values(RawSubCategory).find((category) => category.toLowerCase() === sub_category.toLowerCase());
             if (!mappedSubCategory) {
-                return res.status(400).json({ error: "Invalid subcategory for raw inventory type" });
+                return res
+                    .status(400)
+                    .json({ error: "Invalid subcategory for raw inventory type" });
             }
             if (extra_fields && !Array.isArray(extra_fields)) {
-                return res.status(400).json({ error: "Extra fields should be an array" });
+                return res
+                    .status(400)
+                    .json({ error: "Extra fields should be an array" });
             }
         }
         const item = yield Inventory.create({
@@ -84,7 +106,9 @@ export const updateItemQuantity = (req, res) => __awaiter(void 0, void 0, void 0
             return res.status(400).json({ error: "Please proide item Id" });
         }
         if (!quantity && !min_limit) {
-            return res.status(400).json({ error: "Please provide quantity or min_limit" });
+            return res
+                .status(400)
+                .json({ error: "Please provide quantity or min_limit" });
         }
         const updateFields = { quantity: quantity };
         if (quantity !== undefined) {
@@ -93,7 +117,9 @@ export const updateItemQuantity = (req, res) => __awaiter(void 0, void 0, void 0
         if (min_limit !== undefined) {
             updateFields.min_limit = min_limit;
         }
-        const item = yield Inventory.findByIdAndUpdate(item_id, updateFields, { new: true });
+        const item = yield Inventory.findByIdAndUpdate(item_id, updateFields, {
+            new: true,
+        });
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
         }
