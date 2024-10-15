@@ -5,6 +5,7 @@ import authRouter from "./routes/AuthRouter.js";
 import TodoRouter from "./routes/TodoRouter.js";
 import authenticate from "./middleware/authentication.js";
 import inventoryRouter from "./routes/Inventory.js";
+import productionRouter from "./routes/ProductionRouter.js";
 import cors from "cors";
 import AddPermissions from "./controllers/Rules.js";
 // import roleRouter from "./routes/RoleRouter.js";
@@ -16,18 +17,19 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/auth", authRouter);
-app.use("/todo",authenticate, TodoRouter);
-app.use("/inventory",authenticate ,inventoryRouter);
+app.use("/todo", authenticate, TodoRouter);
+app.use("/inventory", authenticate, inventoryRouter);
+app.use("/production", authenticate, productionRouter);
 // app.use("/role",authenticate,checkPermissions("add-role"), roleRouter);
-app.post("/role", AddPermissions) ;
+app.post("/role", AddPermissions);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Fact-1 Api");
 });
 
-app.listen(process.env.PORT as string, () => {
+app.listen(process.env.PORT as string, async () => {
   try {
-    connectToDb(process.env.MONGO_URL as string);
+    const db = await connectToDb(process.env.MONGO_URL as string);
     console.log(`Listening on port ${process.env.PORT}`);
   } catch (error) {
     console.log("Error connecting to the database: ", error);
