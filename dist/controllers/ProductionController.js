@@ -103,6 +103,17 @@ export const fetchProductions = (req, res) => __awaiter(void 0, void 0, void 0, 
         return res.status(500).json({ error: error.message });
     }
 });
+//function to fetch production for assigned user
+export const getUserAssignedProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { user_id } = req.body;
+        const tasks = yield ProductionModel.find({ assignTo: user_id });
+        return res.status(200).json({ tasks });
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+});
 //function to update production
 export const updateProductionById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;

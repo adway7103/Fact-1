@@ -108,6 +108,20 @@ export const fetchProductions = async (req: Request, res: Response) => {
   }
 };
 
+//function to fetch production for assigned user
+export const getUserAssignedProduction = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { user_id } = req.body;
+    const tasks = await ProductionModel.find({ assignTo: user_id });
+    return res.status(200).json({ tasks });
+  } catch (error: any) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 //function to update production
 export const updateProductionById = async (req: Request, res: Response) => {
   const { id } = req.params;
