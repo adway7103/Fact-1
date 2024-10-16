@@ -8,33 +8,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { ProductionModel } from "../models/Production.js";
+import Inventory from "../models/Inventory.js"; // Import your Inventory model
 import mongoose from "mongoose";
-//function to create a new production
+// Function to create a new production and delete the roll from inventory
 export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone } = req.body;
     if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
         return res.status(400).json({
             success: false,
-            message: "The 'rolls' field is required and must be a non-empty array.",
-        });
-    }
-    if (!expectedDeliveryDate) {
-        return res.status(400).json({
-            success: false,
-            message: "The 'expectedDeliveryDate' field is required.",
+            message: "Please Add Roll to continue.",
         });
     }
     if (assignTo === "others") {
         if (!name) {
             return res.status(400).json({
                 success: false,
-                message: "The 'name' field is required when assigning to others.",
+                message: "The 'name' field is required.",
             });
         }
         if (!contact) {
             return res.status(400).json({
                 success: false,
-                message: "The 'contact' field is required when assigning to others.",
+                message: "The 'contact' field is required.",
             });
         }
         assignTo = null;
@@ -43,11 +38,18 @@ export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0
         if (!mongoose.Types.ObjectId.isValid(assignTo)) {
             return res.status(400).json({
                 success: false,
-                message: "The 'assignTo' field must be a valid ObjectId.",
+                message: "The Assign To field is required.",
             });
         }
     }
+    if (!expectedDeliveryDate) {
+        return res.status(400).json({
+            success: false,
+            message: "The Expected Delivery Date is required.",
+        });
+    }
     try {
+        // Create the new production
         const newProduction = new ProductionModel({
             rolls,
             name: assignTo === null ? name : undefined,
@@ -57,9 +59,21 @@ export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0
             markAsDone: markAsDone || false,
         });
         const savedProduction = yield newProduction.save();
+        //deleting roll based on rollNum after starting production.
+        for (const roll of rolls) {
+            const inventoryRoll = yield Inventory.findOneAndDelete({
+                "extra_fields.0.roll_number": roll.rollNo,
+            });
+            if (!inventoryRoll) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Roll with rollNo ${roll.rollNo} not found in Inventory.`,
+                });
+            }
+        }
         return res.status(201).json({
             success: true,
-            message: "Production created successfully.",
+            message: "Production created successfully and roll(s) deleted from inventory.",
             production: savedProduction,
         });
     }
@@ -77,7 +91,7 @@ export const fetchProductions = (req, res) => __awaiter(void 0, void 0, void 0, 
     try {
         const productions = yield ProductionModel.find().populate({
             path: "assignTo", // Field in Production schema
-            select: "name", // Only select the 'name' field from the User schema
+            select: "name phoneNo", // Only select the 'name' field from the User schema
         });
         return res.status(200).json({
             success: true,
