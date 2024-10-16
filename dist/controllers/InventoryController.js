@@ -82,6 +82,16 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     .json({ error: "Extra fields should be an array" });
             }
         }
+        const rollNumberField = extra_fields.find((field) => field.hasOwnProperty("roll_number"));
+        const rollNumber = rollNumberField["roll_number"];
+        const existingInventory = yield Inventory.findOne({
+            "extra_fields.roll_number": rollNumber,
+        });
+        if (existingInventory) {
+            return res.status(400).json({
+                error: `Roll number ${rollNumber} already exists in the inventory.`,
+            });
+        }
         const item = yield Inventory.create({
             name,
             quantity,

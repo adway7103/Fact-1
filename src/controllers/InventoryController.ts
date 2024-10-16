@@ -102,6 +102,22 @@ export const addItem = async (req: Request, res: Response) => {
       }
     }
 
+    const rollNumberField = extra_fields.find((field: any) =>
+      field.hasOwnProperty("roll_number")
+    );
+
+    const rollNumber = rollNumberField["roll_number"];
+
+    const existingInventory = await Inventory.findOne({
+      "extra_fields.roll_number": rollNumber,
+    });
+
+    if (existingInventory) {
+      return res.status(400).json({
+        error: `Roll number ${rollNumber} already exists in the inventory.`,
+      });
+    }
+
     const item = await Inventory.create({
       name,
       quantity,
