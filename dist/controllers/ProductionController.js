@@ -107,8 +107,12 @@ export const fetchProductions = (req, res) => __awaiter(void 0, void 0, void 0, 
 export const getUserAssignedProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.body;
-        const tasks = yield ProductionModel.find({ assignTo: user_id });
-        return res.status(200).json({ tasks });
+        const productions = yield ProductionModel.find({ assignTo: user_id });
+        return res.status(200).json({
+            success: true,
+            message: "My Production fetched successfully.",
+            productions,
+        });
     }
     catch (error) {
         return res.status(500).json({ message: "Internal server error" });

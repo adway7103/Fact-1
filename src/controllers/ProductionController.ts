@@ -115,9 +115,12 @@ export const getUserAssignedProduction = async (
 ) => {
   try {
     const { user_id } = req.body;
-    const tasks = await ProductionModel.find({ assignTo: user_id });
-    return res.status(200).json({ tasks });
-  } catch (error: any) {
+    const productions = await ProductionModel.find({ assignTo: user_id });
+    return res.status(200).json({
+      success: true,
+      message: "My Production fetched successfully.",
+      productions,
+    });  } catch (error: any) {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
