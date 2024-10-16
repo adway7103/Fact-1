@@ -55,37 +55,42 @@ const ProductionDetailsSchema = new mongoose.Schema<ProductionDetails>({
 });
 
 // Create the IProduction schema
-const ProductionSchema = new mongoose.Schema<IProduction>({
-  rolls: {
-    type: [ProductionDetailsSchema], // Use the ProductionDetails schema
-    required: true,
+const ProductionSchema = new mongoose.Schema<IProduction>(
+  {
+    rolls: {
+      type: [ProductionDetailsSchema], // Use the ProductionDetails schema
+      required: true,
+    },
+    name: {
+      type: String,
+      required: function () {
+        return this.assignTo === null;
+      }, // Only required if assignTo is null
+    },
+    contact: {
+      type: String,
+      required: function () {
+        return this.assignTo === null;
+      }, // Only required if assignTo is null
+    },
+    expectedDeliveryDate: {
+      type: String,
+      required: true,
+    },
+    assignTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+    markAsDone: {
+      type: Boolean,
+      default: false, // Default is false (not done)
+    },
   },
-  name: {
-    type: String,
-    required: function () {
-      return this.assignTo === null;
-    }, // Only required if assignTo is null
-  },
-  contact: {
-    type: String,
-    required: function () {
-      return this.assignTo === null;
-    }, // Only required if assignTo is null
-  },
-  expectedDeliveryDate: {
-    type: String,
-    required: true,
-  },
-  assignTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: false,
-  },
-  markAsDone: {
-    type: Boolean,
-    default: false, // Default is false (not done)
-  },
-});
+  {
+    timestamps: true, // Add timestamps to the schema
+  }
+);
 
 // Create the model
 export const ProductionModel = mongoose.model<IProduction>(

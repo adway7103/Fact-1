@@ -62,6 +62,8 @@ const ProductionSchema = new mongoose.Schema({
         type: Boolean,
         default: false, // Default is false (not done)
     },
+}, {
+    timestamps: true, // Add timestamps to the schema
 });
 // Create the model
 export const ProductionModel = mongoose.model("Production", ProductionSchema);
