@@ -91,7 +91,7 @@ export const fetchProductions = (req, res) => __awaiter(void 0, void 0, void 0, 
     try {
         const productions = yield ProductionModel.find().populate({
             path: "assignTo", // Field in Production schema
-            select: "name phoneNo", // Only select the 'name' field from the User schema
+            select: "name phoneNo", // Only select the 'name' and 'phoneNo' field from the User schema
         });
         return res.status(200).json({
             success: true,
@@ -101,5 +101,34 @@ export const fetchProductions = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
     catch (error) {
         return res.status(500).json({ error: error.message });
+    }
+});
+//function to update production
+export const updateProductionById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { markAsDone } = req.body;
+    try {
+        const production = yield ProductionModel.findById(id);
+        if (!production) {
+            return res.status(404).json({
+                success: false,
+                message: "Production not found.",
+            });
+        }
+        production.markAsDone = markAsDone;
+        const updatedProduction = yield production.save();
+        return res.status(200).json({
+            success: true,
+            message: "Production updated successfully.",
+            production: updatedProduction,
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error.",
+            error: error.message,
+        });
     }
 });

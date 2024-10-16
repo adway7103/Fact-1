@@ -95,7 +95,7 @@ export const fetchProductions = async (req: Request, res: Response) => {
   try {
     const productions = await ProductionModel.find().populate({
       path: "assignTo", // Field in Production schema
-      select: "name phoneNo", // Only select the 'name' field from the User schema
+      select: "name phoneNo", // Only select the 'name' and 'phoneNo' field from the User schema
     });
 
     return res.status(200).json({
@@ -105,5 +105,37 @@ export const fetchProductions = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+//function to update production
+export const updateProductionById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { markAsDone } = req.body;
+
+  try {
+    const production = await ProductionModel.findById(id);
+
+    if (!production) {
+      return res.status(404).json({
+        success: false,
+        message: "Production not found.",
+      });
+    }
+    production.markAsDone = markAsDone;
+    const updatedProduction = await production.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Production updated successfully.",
+      production: updatedProduction,
+    });
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error.",
+      error: error.message,
+    });
   }
 };
