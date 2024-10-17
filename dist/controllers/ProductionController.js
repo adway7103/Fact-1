@@ -10,7 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { ProductionModel } from "../models/Production.js";
 import Inventory from "../models/Inventory.js"; // Import your Inventory model
 import mongoose from "mongoose";
-import puppeteer from "puppeteer";
+// @ts-ignore
+import pdf from "html-pdf-node"; // Import html-pdf-node
 // Function to create a new production and delete the roll from inventory
 export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone } = req.body;
@@ -201,7 +202,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <td>${roll.price}</td>
       </tr>
     </table>
-    <br/> <!-- Add space between tables -->
+    <br/>
   `)
             .join("");
         // HTML content for the PDF
@@ -221,7 +222,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
             border: 1px solid #dddddd; 
             text-align: center; 
             padding: 8px; 
-            width: 50%; /* Adjust width if needed */
+            width: 50%; 
           }
           th { 
             background-color: #f2f2f2; 
@@ -231,7 +232,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       </head>
       <body>
         <h1>Production Details</h1>
-        ${rollTables} <!-- Insert generated roll tables here -->
+        ${rollTables} 
         <h2>Assign To</h2>
         <p>Name: ${(_a = production === null || production === void 0 ? void 0 : production.assignTo) === null || _a === void 0 ? void 0 : _a.name}</p>
         <p>Phone Number: ${(_b = production === null || production === void 0 ? void 0 : production.assignTo) === null || _b === void 0 ? void 0 : _b.phoneNo}</p>
@@ -241,24 +242,17 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       </body>
     </html>
   `;
-        console.log(htmlContent);
-        const browser = yield puppeteer.launch({
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-            headless: true,
+        // Convert HTML content to PDF
+        const file = { content: htmlContent }; // html-pdf-node accepts object with HTML content
+        const options = { format: "A4" }; // You can set options like paper size, margins, etc.
+        // Generate PDF
+        pdf.generatePdf(file, options).then((pdfBuffer) => {
+            // Set headers for PDF download
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", "attachment; filename=order-details.pdf");
+            // Send the PDF buffer as response
+            res.end(pdfBuffer);
         });
-        const page = yield browser.newPage();
-        yield page.setContent(htmlContent, { waitUntil: "networkidle0" });
-        const pdfBuffer = yield page.pdf({
-            width: "12in", // or '300mm'
-            height: "8.5in", // or '215mm'
-            printBackground: true,
-        });
-        yield browser.close();
-        // Set headers to download the PDF
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=order-details.pdf");
-        // Send the PDF buffer as response
-        res.end(pdfBuffer);
     }
     catch (error) {
         console.error("Error generating PDF:", error);

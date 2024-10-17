@@ -4,6 +4,8 @@ import Inventory from "../models/Inventory.js"; // Import your Inventory model
 import mongoose from "mongoose";
 import puppeteer from "puppeteer";
 import { IProduction } from "../interface/interface.js";
+// @ts-ignore
+import pdf from "html-pdf-node"; // Import html-pdf-node
 
 // Function to create a new production and delete the roll from inventory
 export const startNewProduction = async (req: Request, res: Response) => {
@@ -219,7 +221,7 @@ export const generatePdf = async (req: Request, res: Response) => {
         <td>${roll.price}</td>
       </tr>
     </table>
-    <br/> <!-- Add space between tables -->
+    <br/>
   `
       )
       .join("");
@@ -241,7 +243,7 @@ export const generatePdf = async (req: Request, res: Response) => {
             border: 1px solid #dddddd; 
             text-align: center; 
             padding: 8px; 
-            width: 50%; /* Adjust width if needed */
+            width: 50%; 
           }
           th { 
             background-color: #f2f2f2; 
@@ -251,7 +253,7 @@ export const generatePdf = async (req: Request, res: Response) => {
       </head>
       <body>
         <h1>Production Details</h1>
-        ${rollTables} <!-- Insert generated roll tables here -->
+        ${rollTables} 
         <h2>Assign To</h2>
         <p>Name: ${production?.assignTo?.name}</p>
         <p>Phone Number: ${production?.assignTo?.phoneNo}</p>
@@ -262,32 +264,22 @@ export const generatePdf = async (req: Request, res: Response) => {
     </html>
   `;
 
-  console.log(htmlContent);
-  
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    headless: true,
-  });
-  
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({
-      width: "12in", // or '300mm'
-      height: "8.5in", // or '215mm'
-      printBackground: true,
+    // Convert HTML content to PDF
+    const file = { content: htmlContent }; // html-pdf-node accepts object with HTML content
+    const options = { format: "A4" }; // You can set options like paper size, margins, etc.
+
+    // Generate PDF
+    pdf.generatePdf(file, options).then((pdfBuffer: Buffer) => {
+      // Set headers for PDF download
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=order-details.pdf"
+      );
+
+      // Send the PDF buffer as response
+      res.end(pdfBuffer);
     });
-
-    await browser.close();
-
-    // Set headers to download the PDF
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=order-details.pdf"
-    );
-
-    // Send the PDF buffer as response
-    res.end(pdfBuffer);
   } catch (error) {
     console.error("Error generating PDF:", error);
     res.status(500).json({ message: "Error generating PDF" });
