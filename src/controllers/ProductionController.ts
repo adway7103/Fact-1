@@ -261,13 +261,10 @@ export const generatePdf = async (req: Request, res: Response) => {
       </body>
     </html>
   `;
-
-  console.log('Using Puppeteer executable path:', process.env.PUPPETEER_EXECUTABLE_PATH);
-  const browser = await puppeteer.launch({
+    const browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       headless: true,
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+      executablePath: puppeteer.executablePath(),
     });
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
