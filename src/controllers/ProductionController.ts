@@ -261,6 +261,9 @@ export const generatePdf = async (req: Request, res: Response) => {
       </body>
     </html>
   `;
+
+  console.log(htmlContent);
+  
     const browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       headless: false,

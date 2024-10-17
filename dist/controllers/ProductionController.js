@@ -241,6 +241,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       </body>
     </html>
   `;
+        console.log(htmlContent);
         const browser = yield puppeteer.launch({
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
             headless: false,
