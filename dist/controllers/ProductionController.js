@@ -243,7 +243,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
   `;
         const browser = yield puppeteer.launch({
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
-            headless: true,
+            headless: false,
             executablePath: puppeteer.executablePath(),
         });
         const page = yield browser.newPage();

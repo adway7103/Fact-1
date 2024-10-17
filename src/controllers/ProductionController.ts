@@ -263,7 +263,7 @@ export const generatePdf = async (req: Request, res: Response) => {
   `;
     const browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: true,
+      headless: false,
       executablePath: puppeteer.executablePath(),
     });
     const page = await browser.newPage();
