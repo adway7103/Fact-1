@@ -199,7 +199,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       </tr>
       <tr>
         <th>Price</th>
-        <td>${roll.price}</td>
+        <td>₹ ${roll.price}</td>
       </tr>
     </table>
     <br/>

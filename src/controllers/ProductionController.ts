@@ -218,7 +218,7 @@ export const generatePdf = async (req: Request, res: Response) => {
       </tr>
       <tr>
         <th>Price</th>
-        <td>${roll.price}</td>
+        <td>₹ ${roll.price}</td>
       </tr>
     </table>
     <br/>
