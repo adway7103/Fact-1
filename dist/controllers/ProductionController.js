@@ -241,8 +241,11 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       </body>
     </html>
   `;
-        // Launch Puppeteer and create the PDF
-        const browser = yield puppeteer.launch();
+        const browser = yield puppeteer.launch({
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            headless: true,
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+        });
         const page = yield browser.newPage();
         yield page.setContent(htmlContent, { waitUntil: "networkidle0" });
         const pdfBuffer = yield page.pdf({
