@@ -266,7 +266,7 @@ export const generatePdf = async (req: Request, res: Response) => {
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       headless: true,
       executablePath:
-        'C:/Users/ASUS/.cache/puppeteer/chrome/win64-130.0.6723.58/chrome-win64/chrome.exe',
+        process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
     });
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
