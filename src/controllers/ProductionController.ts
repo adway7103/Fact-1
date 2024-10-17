@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { ProductionModel } from "../models/Production.js";
 import Inventory from "../models/Inventory.js"; // Import your Inventory model
 import mongoose from "mongoose";
+import puppeteer from "puppeteer";
+import { IProduction } from "../interface/interface.js";
 
 // Function to create a new production and delete the roll from inventory
 export const startNewProduction = async (req: Request, res: Response) => {
@@ -158,5 +160,131 @@ export const updateProductionById = async (req: Request, res: Response) => {
       message: "Server error.",
       error: error.message,
     });
+  }
+};
+
+//generate production challan
+export const generatePdf = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch data from the database using the provided ID
+    const productionDocument = await ProductionModel.findById(id).populate({
+      path: "assignTo",
+      select: "name phoneNo",
+    });
+
+    const production = productionDocument?.toObject() as IProduction;
+
+    if (!production) {
+      return res.status(404).json({ message: "Production not found" });
+    }
+
+    function formatDate(date: Date): string {
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    }
+
+    // HTML content for the PDF
+    const rollTables = production.rolls
+      .map(
+        (roll: any) => `
+    <h2>Roll Number: ${roll.rollNo}</h2>
+    <table>
+      <tr>
+        <th>C/P</th>
+        <td>${roll.costPrice}</td>
+      </tr>
+      <tr>
+        <th>No of Pieces</th>
+        <td>${roll.noOfPieces}</td>
+      </tr>
+      <tr>
+        <th>Grade</th>
+        <td>${roll.grade}</td>
+      </tr>
+      <tr>
+        <th>Sort</th>
+        <td>${roll.sort}</td>
+      </tr>
+      <tr>
+        <th>Meter</th>
+        <td>${roll.meter}</td>
+      </tr>
+      <tr>
+        <th>Price</th>
+        <td>${roll.price}</td>
+      </tr>
+    </table>
+    <br/> <!-- Add space between tables -->
+  `
+      )
+      .join("");
+
+    // HTML content for the PDF
+    const htmlContent = `
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; }
+          h2 { margin-top: 20px; }
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+          }
+          th, td { 
+            border: 1px solid #dddddd; 
+            text-align: center; 
+            padding: 8px; 
+            width: 50%; /* Adjust width if needed */
+          }
+          th { 
+            background-color: #f2f2f2; 
+            text-align: left; 
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Production Details</h1>
+        ${rollTables} <!-- Insert generated roll tables here -->
+        <h2>Assign To</h2>
+        <p>Name: ${production?.assignTo?.name}</p>
+        <p>Phone Number: ${production?.assignTo?.phoneNo}</p>
+        <h2>Other Details</h2>
+        <p>Start Date: ${formatDate(production.createdAt)}</p>
+        <p>Expected Delivery Date: ${production.expectedDeliveryDate}</p>
+      </body>
+    </html>
+  `;
+
+    // Launch Puppeteer and create the PDF
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({
+      width: "12in", // or '300mm'
+      height: "8.5in", // or '215mm'
+      printBackground: true,
+    });
+
+    await browser.close();
+
+    // Set headers to download the PDF
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=order-details.pdf"
+    );
+
+    // Send the PDF buffer as response
+    res.end(pdfBuffer);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).json({ message: "Error generating PDF" });
   }
 };
