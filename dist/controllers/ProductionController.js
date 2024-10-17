@@ -244,8 +244,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         console.log(htmlContent);
         const browser = yield puppeteer.launch({
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
-            headless: false,
-            executablePath: puppeteer.executablePath(),
+            headless: true,
         });
         const page = yield browser.newPage();
         yield page.setContent(htmlContent, { waitUntil: "networkidle0" });
