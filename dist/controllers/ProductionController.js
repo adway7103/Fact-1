@@ -244,7 +244,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const browser = yield puppeteer.launch({
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
             headless: true,
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+            executablePath: 'C:/Users/ASUS/.cache/puppeteer/chrome/win64-130.0.6723.58/chrome-win64/chrome.exe',
         });
         const page = yield browser.newPage();
         yield page.setContent(htmlContent, { waitUntil: "networkidle0" });
