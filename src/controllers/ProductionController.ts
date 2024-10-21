@@ -112,6 +112,24 @@ export const fetchProductions = async (req: Request, res: Response) => {
   }
 };
 
+//function to fetch production by id
+export const fetchProductionById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const production = await ProductionModel.findById(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Production fetched successfully.",
+      production,
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //function to fetch production for assigned user
 export const getUserAssignedProduction = async (
   req: Request,
@@ -136,7 +154,7 @@ export const getUserAssignedProduction = async (
 //function to update production
 export const updateProductionById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { markAsDone } = req.body;
+  const { markAsDone, rolls } = req.body;
 
   try {
     const production = await ProductionModel.findById(id);
@@ -147,7 +165,25 @@ export const updateProductionById = async (req: Request, res: Response) => {
         message: "Production not found.",
       });
     }
-    production.markAsDone = markAsDone;
+
+    // Update markAsDone if provided
+    if (typeof markAsDone !== "undefined") {
+      production.markAsDone = markAsDone;
+    }
+
+    // Update noOfPieces for each roll in rollsToUpdate
+    if (Array.isArray(rolls)) {
+      rolls.forEach(({ rollNo, noOfPieces }) => {
+        const rollToUpdate = production.rolls.find(
+          (roll) => roll.rollNo === rollNo
+        );
+
+        if (rollToUpdate) {
+          rollToUpdate.noOfPieces = noOfPieces;
+        }
+      });
+    }
+
     const updatedProduction = await production.save();
 
     return res.status(200).json({
