@@ -105,6 +105,22 @@ export const fetchProductions = (req, res) => __awaiter(void 0, void 0, void 0, 
         return res.status(500).json({ error: error.message });
     }
 });
+//function to fetch production by id
+export const fetchProductionById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        const production = yield ProductionModel.findById(id);
+        return res.status(200).json({
+            success: true,
+            message: "Production fetched successfully.",
+            production,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
+});
 //function to fetch production for assigned user
 export const getUserAssignedProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -126,7 +142,7 @@ export const getUserAssignedProduction = (req, res) => __awaiter(void 0, void 0,
 //function to update production
 export const updateProductionById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const { markAsDone } = req.body;
+    const { markAsDone, rolls } = req.body;
     try {
         const production = yield ProductionModel.findById(id);
         if (!production) {
@@ -135,7 +151,19 @@ export const updateProductionById = (req, res) => __awaiter(void 0, void 0, void
                 message: "Production not found.",
             });
         }
-        production.markAsDone = markAsDone;
+        // Update markAsDone if provided
+        if (typeof markAsDone !== "undefined") {
+            production.markAsDone = markAsDone;
+        }
+        // Update noOfPieces for each roll in rollsToUpdate
+        if (Array.isArray(rolls)) {
+            rolls.forEach(({ rollNo, noOfPieces }) => {
+                const rollToUpdate = production.rolls.find((roll) => roll.rollNo === rollNo);
+                if (rollToUpdate) {
+                    rollToUpdate.noOfPieces = noOfPieces;
+                }
+            });
+        }
         const updatedProduction = yield production.save();
         return res.status(200).json({
             success: true,
