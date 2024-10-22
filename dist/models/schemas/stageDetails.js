@@ -5,7 +5,7 @@ export var StageEnum;
 (function (StageEnum) {
     StageEnum["Karigar"] = "karigar";
     StageEnum["Checking"] = "checking";
-    StageEnum["FeedOff"] = "feedOff";
+    StageEnum["FeedOff"] = "feedoff";
     StageEnum["Overlock"] = "overlock";
     StageEnum["Side_Lupi"] = "side & lupi";
     StageEnum["Belt"] = "belt";
@@ -52,7 +52,7 @@ export const StageDetailsSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    additioanlInformation: {
+    additionalInformation: {
         type: String,
         required: false,
     },
