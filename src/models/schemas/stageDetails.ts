@@ -5,7 +5,7 @@ import "dotenv/config";
 export enum StageEnum {
   Karigar = "karigar",
   Checking = "checking",
-  FeedOff = "feedOff",
+  FeedOff = "feedoff",
   Overlock = "overlock",
   Side_Lupi = "side & lupi",
   Belt = "belt",
@@ -15,15 +15,16 @@ export enum StageEnum {
 
 //define StageDetails interface
 export interface StageDetails {
+  [x: string]: any;
   stage: StageEnum;
   startTime: Date;
-  endTime: Date;
+  endTime?: Date;
   expectedDeliveryDate: string;
   assignTo?: mongoose.Types.ObjectId | null;
   name?: string;
   contact?: string;
   isCompleted: boolean;
-  additioanlInformation: string;
+  additionalInformation: string;
 }
 
 //define StageDetailsSchema schema
@@ -66,7 +67,7 @@ export const StageDetailsSchema = new mongoose.Schema<StageDetails>({
     type: Boolean,
     default: false,
   },
-  additioanlInformation: {
+  additionalInformation: {
     type: String,
     required: false,
   },
