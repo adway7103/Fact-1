@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import mongoose from "mongoose";
 import Lifecycle from "../models/Lifecycle.js";
 import { v4 as uuidv4 } from "uuid";
+import { ProductionModel } from "../models/Production.js";
 // Function to create a new lifecycle
 export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const uuid = uuidv4();
@@ -66,18 +67,24 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
             stages,
         });
         const savedLifecycle = yield newLifecycle.save();
-        //deleting roll based on rollNum after starting production.
-        // for (const roll of rolls) {
-        //   const inventoryRoll = await Inventory.findOneAndDelete({
-        //     "extra_fields.0.roll_number": roll.rollNo,
-        //   });
-        //   if (!inventoryRoll) {
-        //     return res.status(404).json({
-        //       success: false,ssssss
-        //       message: `Roll with rollNo ${roll.rollNo} not found in Inventory.`,
-        //     });
-        //   }
-        // }
+        for (const roll of rolls) {
+            const production = yield ProductionModel.findOne({
+                "rolls.rollNo": roll.rollNo,
+            });
+            if (!production) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Roll with rollNo ${roll.rollNo} not found in production.`,
+                });
+            }
+            if (production.rolls.length > 1) {
+                production.rolls = production.rolls.filter((r) => r.rollNo !== roll.rollNo);
+                yield production.save();
+            }
+            else if (production.rolls.length === 1) {
+                yield ProductionModel.findByIdAndDelete(production._id);
+            }
+        }
         return res.status(201).json({
             success: true,
             message: "Lifecycle started successfully.",
@@ -164,11 +171,10 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
         else {
             stage.endTime = undefined;
         }
-        const isLastStage = lifecycle.stages[lifecycle.stages.length - 1];
-        if (isLastStage._id.toString() === stageId && markAsDone) {
+        if (markAsDone &&
+            lifecycle.stages[lifecycle.stages.length - 1]._id.toString() === stageId) {
             lifecycle.markAsDone = true;
-            lifecycle.stages[lifecycle.stages.length - 1].isCompleted = true;
-            lifecycle.completionDate = new Date();
+            lifecycle.completionDate = new Date(); // Set completion date for the entire lifecycle
         }
         yield lifecycle.save();
         return res.status(200).json({
