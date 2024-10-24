@@ -25,12 +25,18 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
         });
     }
     for (const stage of stages) {
-        const { expectedDeliveryDate, assignTo, name, contact } = stage;
+        const { expectedDeliveryDate, assignTo, name, contact, price } = stage;
         // Validate expectedDeliveryDate
         if (!expectedDeliveryDate) {
             return res.status(400).json({
                 success: false,
-                message: "The Expected Delivery Date is required in stages.",
+                message: "The Expected Delivery Date is required.",
+            });
+        }
+        if (!price) {
+            return res.status(400).json({
+                success: false,
+                message: "The Price Date is required.",
             });
         }
         // Validate assignTo
@@ -196,7 +202,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
 // Function to start a new stage
 export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    let { stage, expectedDeliveryDate, assignTo, name, contact, additionalInformation, } = req.body;
+    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, } = req.body;
     try {
         const lifecycle = yield Lifecycle.findById(id);
         if (!lifecycle) {
@@ -211,6 +217,24 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             return res.status(400).json({
                 success: false,
                 message: `The stage '${stage}' already created in this lifecycle.`,
+            });
+        }
+        if (!assignTo) {
+            return res.status(400).json({
+                success: false,
+                message: `Assign to is required.`,
+            });
+        }
+        if (!expectedDeliveryDate) {
+            return res.status(400).json({
+                success: false,
+                message: `The Expected Delivery Date is required.`,
+            });
+        }
+        if (!price) {
+            return res.status(400).json({
+                success: false,
+                message: `The Price is required.`,
             });
         }
         // Validate assignTo
@@ -228,7 +252,6 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
                 });
             }
             assignTo = null;
-            console.log(assignTo);
         }
         else if (!mongoose.Types.ObjectId.isValid(assignTo)) {
             return res.status(400).json({
@@ -240,6 +263,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             stage: stage.toLowerCase(),
             startTime: new Date(),
             expectedDeliveryDate,
+            price,
             assignTo,
             name,
             contact,
@@ -298,15 +322,23 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         </tr>
         <tr>
           <th>Expected Delivery Date</th>
-          <td>${findStage.expectedDeliveryDate ? findStage.expectedDeliveryDate : "-"}</td>
+          <td>${findStage.expectedDeliveryDate
+            ? findStage.expectedDeliveryDate
+            : "-"}</td>
         </tr>
         <tr>
           <th>Delivery Date</th>
           <td>${findStage.endTime ? formatDate(findStage.endTime) : "-"}</td>
         </tr>
-        <tr>
+         <tr>
           <th>Assign To</th>
           <td>${findStage.assignTo ? findStage.assignTo.name : findStage.name}</td>
+        </tr>
+        <tr>
+          <th>Price</th>
+          <td>${findStage.price
+            ? findStage.price
+            : "-"}</td>
         </tr>
         <tr>
           <th>Phone number</th>
@@ -370,5 +402,20 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
     catch (error) {
         console.error("Error generating PDF:", error);
         res.status(500).json({ message: "Error generating PDF" });
+    }
+});
+//function to deleet all lifecycle
+export const deleteAllLifecycles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Delete all lifecycles
+        const result = yield Lifecycle.deleteMany({}); // Delete all documents in the collection
+        return res.status(200).json({
+            success: true,
+            message: "All lifecycles deleted successfully.",
+            deletedCount: result.deletedCount, // Returns the count of deleted documents
+        });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
     }
 });

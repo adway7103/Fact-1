@@ -52,6 +52,10 @@ export const StageDetailsSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    price: {
+        type: String,
+        required: true,
+    },
     additionalInformation: {
         type: String,
         required: false,

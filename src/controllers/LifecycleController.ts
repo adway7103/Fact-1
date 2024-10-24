@@ -22,13 +22,19 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
   }
 
   for (const stage of stages) {
-    const { expectedDeliveryDate, assignTo, name, contact } = stage;
+    const { expectedDeliveryDate, assignTo, name, contact, price } = stage;
 
     // Validate expectedDeliveryDate
     if (!expectedDeliveryDate) {
       return res.status(400).json({
         success: false,
-        message: "The Expected Delivery Date is required in stages.",
+        message: "The Expected Delivery Date is required.",
+      });
+    }
+    if (!price) {
+      return res.status(400).json({
+        success: false,
+        message: "The Price Date is required.",
       });
     }
 
@@ -96,7 +102,6 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
         await ProductionModel.findByIdAndDelete(production._id);
       }
     }
-
     return res.status(201).json({
       success: true,
       message: "Lifecycle started successfully.",
@@ -224,6 +229,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
     assignTo,
     name,
     contact,
+    price,
     additionalInformation,
   } = req.body;
 
@@ -248,6 +254,25 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       });
     }
 
+    if (!assignTo) {
+      return res.status(400).json({
+        success: false,
+        message: `Assign to is required.`,
+      });
+    }
+    if (!expectedDeliveryDate) {
+      return res.status(400).json({
+        success: false,
+        message: `The Expected Delivery Date is required.`,
+      });
+    }
+    if (!price) {
+      return res.status(400).json({
+        success: false,
+        message: `The Price is required.`,
+      });
+    }
+
     // Validate assignTo
     if (assignTo === "others") {
       if (!name) {
@@ -265,7 +290,6 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       }
 
       assignTo = null;
-      console.log(assignTo);
     } else if (!mongoose.Types.ObjectId.isValid(assignTo)) {
       return res.status(400).json({
         success: false,
@@ -277,6 +301,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       stage: stage.toLowerCase(),
       startTime: new Date(),
       expectedDeliveryDate,
+      price,
       assignTo,
       name,
       contact,
@@ -289,6 +314,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       { $push: { stages: newStage } },
       { new: true }
     );
+
     return res.status(201).json({
       success: true,
       message: "Lifecycle stage started successfully.",
@@ -345,20 +371,34 @@ export const generatePdf = async (req: Request, res: Response) => {
       <table>
         <tr>
           <th>Start Date</th>
-          <td>${findStage.startTime ? formatDate(findStage.startTime) : "-"}</td>
+          <td>${
+            findStage.startTime ? formatDate(findStage.startTime) : "-"
+          }</td>
         </tr>
         <tr>
           <th>Expected Delivery Date</th>
-          <td>${findStage.expectedDeliveryDate ? findStage.expectedDeliveryDate : "-"}</td>
+          <td>${
+            findStage.expectedDeliveryDate
+              ? findStage.expectedDeliveryDate
+              : "-"
+          }</td>
         </tr>
         <tr>
           <th>Delivery Date</th>
           <td>${findStage.endTime ? formatDate(findStage.endTime) : "-"}</td>
         </tr>
-        <tr>
+         <tr>
           <th>Assign To</th>
           <td>${
             findStage.assignTo ? findStage.assignTo.name : findStage.name
+          }</td>
+        </tr>
+        <tr>
+          <th>Price</th>
+          <td>${
+            findStage.price
+              ? findStage.price
+              : "-"
           }</td>
         </tr>
         <tr>
@@ -433,5 +473,21 @@ export const generatePdf = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error generating PDF:", error);
     res.status(500).json({ message: "Error generating PDF" });
+  }
+};
+
+//function to deleet all lifecycle
+export const deleteAllLifecycles = async (req: Request, res: Response) => {
+  try {
+    // Delete all lifecycles
+    const result = await Lifecycle.deleteMany({}); // Delete all documents in the collection
+
+    return res.status(200).json({
+      success: true,
+      message: "All lifecycles deleted successfully.",
+      deletedCount: result.deletedCount, // Returns the count of deleted documents
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
   }
 };
