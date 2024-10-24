@@ -11,6 +11,8 @@ import mongoose from "mongoose";
 import Lifecycle from "../models/Lifecycle.js";
 import { v4 as uuidv4 } from "uuid";
 import { ProductionModel } from "../models/Production.js";
+// @ts-ignore
+import pdf from "html-pdf-node"; // Import html-pdf-node
 // Function to create a new lifecycle
 export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const uuid = uuidv4();
@@ -258,5 +260,114 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             message: "Server error.",
             error: error.message,
         });
+    }
+});
+//generate production challan
+export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, stageId } = req.params;
+        // Fetch data from the database using the provided ID
+        const lifecycleData = yield Lifecycle.findById(id).populate({
+            path: "stages.assignTo",
+            select: "name phoneNo",
+        });
+        const lifecycle = lifecycleData === null || lifecycleData === void 0 ? void 0 : lifecycleData.toObject();
+        if (!lifecycle) {
+            return res.status(404).json({ message: "Lifecycle not found" });
+        }
+        const findStage = lifecycle.stages.find((stage) => stage._id == stageId);
+        if (!findStage) {
+            return res.status(404).json({ message: "Stage not found" });
+        }
+        // Function to format date
+        function formatDate(date) {
+            if (!date)
+                return 'N/A';
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        // HTML content for the PDF
+        const rollTables = `
+      <h3>Stage: ${findStage.stage}</h2>
+
+      <table>
+        <tr>
+          <th>Start Date</th>
+          <td>${formatDate(findStage.startTime)}</td>
+        </tr>
+        <tr>
+          <th>Expected Delivery Date</th>
+          <td>${findStage.expectedDeliveryDate}</td>
+        </tr>
+        <tr>
+          <th>Delivery Date</th>
+          <td>${formatDate(findStage.endTime)}</td>
+        </tr>
+        <tr>
+          <th>Assign To</th>
+          <td>${findStage.assignTo ? findStage.assignTo.name : findStage.name}</td>
+        </tr>
+        <tr>
+          <th>Phone number</th>
+          <td>${findStage.assignTo ? findStage.assignTo.phoneNo : findStage.contact}</td>
+        </tr>
+        <tr>
+          <th>Additional Information</th>
+          <td>${findStage.additionalInformation ? findStage.additionalInformation : "-"}</td>
+        </tr>
+      </table>
+      <br/>
+    `;
+        // HTML content for the PDF
+        const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; }
+            h2 { text-align: center; }
+            h3 { margin-top: 20px; }
+            table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin-top: 20px; 
+            }
+            th, td { 
+              border: 1px solid #dddddd; 
+              text-align: center; 
+              padding: 8px; 
+              width: 50%; 
+            }
+            th { 
+              background-color: #f2f2f2; 
+              text-align: left; 
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Lifecycle Stage Details</h1>
+          <h2>Lot Number: ${lifecycle.lotNo}</h2>
+          ${rollTables} 
+         
+        </body>
+      </html>
+    `;
+        // Convert HTML content to PDF
+        const file = { content: htmlContent }; // html-pdf-node accepts object with HTML content
+        const options = { format: "A4" }; // You can set options like paper size, margins, etc.
+        // Generate PDF
+        pdf.generatePdf(file, options).then((pdfBuffer) => {
+            // Set headers for PDF download
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Disposition", "attachment; filename=order-details.pdf");
+            // Send the PDF buffer as response
+            res.end(pdfBuffer);
+        });
+    }
+    catch (error) {
+        console.error("Error generating PDF:", error);
+        res.status(500).json({ message: "Error generating PDF" });
     }
 });
