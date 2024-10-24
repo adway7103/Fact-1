@@ -345,15 +345,15 @@ export const generatePdf = async (req: Request, res: Response) => {
       <table>
         <tr>
           <th>Start Date</th>
-          <td>${formatDate(findStage.startTime)}</td>
+          <td>${findStage.startTime ? formatDate(findStage.startTime) : "-"}</td>
         </tr>
         <tr>
           <th>Expected Delivery Date</th>
-          <td>${findStage.expectedDeliveryDate}</td>
+          <td>${findStage.expectedDeliveryDate ? findStage.expectedDeliveryDate : "-"}</td>
         </tr>
         <tr>
           <th>Delivery Date</th>
-          <td>${formatDate(findStage.endTime)}</td>
+          <td>${findStage.endTime ? formatDate(findStage.endTime) : "-"}</td>
         </tr>
         <tr>
           <th>Assign To</th>

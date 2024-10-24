@@ -266,7 +266,6 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
 export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id, stageId } = req.params;
-        // Fetch data from the database using the provided ID
         const lifecycleData = yield Lifecycle.findById(id).populate({
             path: "stages.assignTo",
             select: "name phoneNo",
@@ -282,7 +281,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         // Function to format date
         function formatDate(date) {
             if (!date)
-                return 'N/A';
+                return "N/A";
             const day = String(date.getDate()).padStart(2, "0");
             const month = String(date.getMonth() + 1).padStart(2, "0");
             const year = date.getFullYear();
@@ -295,15 +294,15 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       <table>
         <tr>
           <th>Start Date</th>
-          <td>${formatDate(findStage.startTime)}</td>
+          <td>${findStage.startTime ? formatDate(findStage.startTime) : "-"}</td>
         </tr>
         <tr>
           <th>Expected Delivery Date</th>
-          <td>${findStage.expectedDeliveryDate}</td>
+          <td>${findStage.expectedDeliveryDate ? findStage.expectedDeliveryDate : "-"}</td>
         </tr>
         <tr>
           <th>Delivery Date</th>
-          <td>${formatDate(findStage.endTime)}</td>
+          <td>${findStage.endTime ? formatDate(findStage.endTime) : "-"}</td>
         </tr>
         <tr>
           <th>Assign To</th>
@@ -315,7 +314,9 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         </tr>
         <tr>
           <th>Additional Information</th>
-          <td>${findStage.additionalInformation ? findStage.additionalInformation : "-"}</td>
+          <td>${findStage.additionalInformation
+            ? findStage.additionalInformation
+            : "-"}</td>
         </tr>
       </table>
       <br/>
