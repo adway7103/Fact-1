@@ -19,6 +19,25 @@ export const getItems = (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(400).json({ error: error.message });
     }
 });
+export const getItemsBySubcategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const sub_category = req.query.type;
+    if (!sub_category) {
+        return res.status(400).json({
+            success: false,
+            message: "Subcategory is required.",
+        });
+    }
+    try {
+        const items = yield Inventory.find({
+            inventory_type: "raw",
+            sub_category: sub_category,
+        });
+        return res.status(200).json({ items });
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+});
 export const getRollItemById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
