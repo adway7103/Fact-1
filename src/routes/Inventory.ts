@@ -6,11 +6,13 @@ import {
   deleteItem,
   getItems,
   getRollItemById,
+  getItemsBySubcategory,
 } from "../controllers/InventoryController.js";
 
 const router = express.Router();
 router
   .get("/get-items", getItems)
+  .get("/getItemsBySubcategory", getItemsBySubcategory)
   .get("/get-item/:id", getRollItemById)
   .post("/add-item", addItem)
   .put("/update-item", updateItemQuantity)
