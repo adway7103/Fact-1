@@ -11,6 +11,25 @@ export const getItems = async (req: Request, res: Response) => {
     return res.status(400).json({ error: error.message });
   }
 };
+export const getItemsBySubcategory = async (req: Request, res: Response) => {
+  const sub_category = req.query.type;
+
+  if (!sub_category) {
+    return res.status(400).json({
+      success: false,
+      message: "Subcategory is required.",
+    });
+  }
+  try {
+    const items = await Inventory.find({
+      inventory_type: "raw",
+      sub_category: sub_category,
+    });
+    return res.status(200).json({ items });
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
+  }
+};
 export const getRollItemById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
