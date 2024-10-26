@@ -11,6 +11,7 @@ export const getItems = async (req: Request, res: Response) => {
     return res.status(400).json({ error: error.message });
   }
 };
+
 export const getItemsBySubcategory = async (req: Request, res: Response) => {
   const sub_category = req.query.type;
 
@@ -30,6 +31,7 @@ export const getItemsBySubcategory = async (req: Request, res: Response) => {
     return res.status(400).json({ error: error.message });
   }
 };
+
 export const getRollItemById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -39,6 +41,7 @@ export const getRollItemById = async (req: Request, res: Response) => {
     return res.status(400).json({ error: error.message });
   }
 };
+
 export const updateRawSubcategory = async (req: Request, res: Response) => {
   try {
     const { item_id, sub_category } = req.body;
@@ -65,6 +68,7 @@ export const updateRawSubcategory = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Item Subcategory updated" });
   } catch (error: any) {}
 };
+
 export const addItem = async (req: Request, res: Response) => {
   try {
     const {
