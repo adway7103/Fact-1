@@ -10,7 +10,7 @@ const IssuanceSchema = new mongoose.Schema({
     stage: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: "stageDetails",
+        ref: "Lifecycle",
     },
     inventory: {
         type: String,
