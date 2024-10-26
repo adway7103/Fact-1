@@ -139,12 +139,90 @@ export const issueInventoryItems = async (req: Request, res: Response) => {
 //function to fetch all issuance records
 export const fetchIssuanceRecords = async (req: Request, res: Response) => {
   try {
-    const issuanceRecords = await Issuance.find();
+    const issuanceRecords = await Issuance.find()
+      .populate({
+        path: "lot",
+        select: "lotNo",
+      })
+      .populate({
+        path: "allotTo allotBy",
+        select: "name phoneNo",
+      });
 
-    return res.status(200).json({
+    const lotIds = [
+      ...new Set(issuanceRecords.map((issuance) => issuance.lot._id)),
+    ];
+
+    const lifecycleRecords = await Lifecycle.find({ _id: { $in: lotIds } });
+
+    const issuanceWithStageDetails = issuanceRecords.map((issuance) => {
+      const lifecycle = lifecycleRecords.find(
+        (l) => l._id.toString() === issuance.lot._id.toString()
+      );
+
+      const stageDetails = lifecycle?.stages.find(
+        (stage) => stage._id.toString() === issuance.stage.toString()
+      );
+
+      return {
+        ...issuance.toObject(),
+        stageDetails: stageDetails || null,
+      };
+    });
+
+    res.json({
       success: true,
       message: "Issuance Records fetched successfully.",
-      issuanceRecords,
+      issuanceRecords: issuanceWithStageDetails,
+      count: issuanceWithStageDetails.length,
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+//function to fetch issuance records with lot id
+export const fetchIssuanceRecordsWitId = async (
+  req: Request,
+  res: Response
+) => {
+  const { id } = req.params;
+  try {
+    const issuanceRecord = await Issuance.find({ lot: id })
+      .populate({
+        path: "lot",
+        select: "lotNo",
+      })
+      .populate({
+        path: "allotTo allotBy",
+        select: "name phoneNo",
+      });
+    const lotIds = [
+      ...new Set(issuanceRecord.map((issuance) => issuance.lot._id)),
+    ];
+
+    const lifecycleRecords = await Lifecycle.find({ _id: { $in: lotIds } });
+
+    const issuanceWithStageDetails = issuanceRecord.map((issuance) => {
+      const lifecycle = lifecycleRecords.find(
+        (l) => l._id.toString() === issuance.lot._id.toString()
+      );
+
+      const stageDetails = lifecycle?.stages.find(
+        (stage) => stage._id.toString() === issuance.stage.toString()
+      );
+
+      return {
+        ...issuance.toObject(),
+        stageDetails: stageDetails || null,
+      };
+    });
+
+    res.json({
+      success: true,
+      message: "Issuance Records fetched successfully.",
+      issuanceRecord: issuanceWithStageDetails,
+      count: issuanceWithStageDetails.length,
     });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
