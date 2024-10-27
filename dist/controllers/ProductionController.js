@@ -127,7 +127,10 @@ export const getUserAssignedProduction = (req, res) => __awaiter(void 0, void 0,
         const { user_id } = req.body;
         const productions = yield ProductionModel.find({
             assignTo: user_id,
-            markAsDone: false,
+            // markAsDone: false,
+        }).populate({
+            path: "assignTo",
+            select: "name phoneNo",
         });
         return res.status(200).json({
             success: true,

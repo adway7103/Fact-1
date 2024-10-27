@@ -139,7 +139,10 @@ export const getUserAssignedProduction = async (
     const { user_id } = req.body;
     const productions = await ProductionModel.find({
       assignTo: user_id,
-      markAsDone: false,
+      // markAsDone: false,
+    }).populate({
+      path: "assignTo",
+      select: "name phoneNo",
     });
     return res.status(200).json({
       success: true,
