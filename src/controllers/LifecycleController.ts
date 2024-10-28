@@ -135,6 +135,39 @@ export const fetchLifecycles = async (req: Request, res: Response) => {
   }
 };
 
+//function to fetch user assigned lifecycle by id
+export const fetchUserAssignedLifecycles = async (
+  req: Request,
+  res: Response
+) => {
+  const { user_id } = req.body;
+
+  try {
+    const lifecycles = await Lifecycle.find().populate("stages.assignTo");
+
+    const filteredLifecycles = lifecycles
+      .map((lifecycle: any) => {
+        const userAssignedStages = lifecycle.stages.filter(
+          (stage: any) => stage.assignTo._id.toString() === user_id.toString()
+        );
+
+        return {
+          ...lifecycle._doc,
+          stages: userAssignedStages,
+        };
+      })
+      .filter((lifecycle: any) => lifecycle.stages.length > 0);
+
+    return res.status(200).json({
+      success: true,
+      message: "Lifecycle fetched successfully.",
+      lifecycle: filteredLifecycles,
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 //function to fetch lifecycle by id
 export const fetchLifecycleById = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -395,11 +428,7 @@ export const generatePdf = async (req: Request, res: Response) => {
         </tr>
         <tr>
           <th>Price</th>
-          <td>${
-            findStage.price
-              ? findStage.price
-              : "-"
-          }</td>
+          <td>${findStage.price ? findStage.price : "-"}</td>
         </tr>
         <tr>
           <th>Phone number</th>
