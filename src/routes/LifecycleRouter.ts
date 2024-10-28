@@ -7,6 +7,7 @@ import {
   startLifecycleNewStage,
   generatePdf,
   deleteAllLifecycles,
+  fetchUserAssignedLifecycles,
 } from "../controllers/LifecycleController.js";
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router
   .post("/:id/new-stage", startLifecycleNewStage)
   .get("/get-all-lifecycle", fetchLifecycles)
   .get("/getLifecycleById/:id", fetchLifecycleById)
+  .get("/get-my-stages", fetchUserAssignedLifecycles)
   .put("/update/:id/:stageId", updateLifecycle)
   .get("/generate-pdf/:id/:stageId", generatePdf)
   .delete("/delete-all", deleteAllLifecycles);
