@@ -125,6 +125,27 @@ export const fetchLifecycles = (req, res) => __awaiter(void 0, void 0, void 0, f
         return res.status(500).json({ error: error.message });
     }
 });
+//function to fetch user assigned lifecycle by id
+export const fetchUserAssignedLifecycles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id } = req.body;
+    try {
+        const lifecycles = yield Lifecycle.find().populate("stages.assignTo");
+        const filteredLifecycles = lifecycles
+            .map((lifecycle) => {
+            const userAssignedStages = lifecycle.stages.filter((stage) => stage.assignTo._id.toString() === user_id.toString());
+            return Object.assign(Object.assign({}, lifecycle._doc), { stages: userAssignedStages });
+        })
+            .filter((lifecycle) => lifecycle.stages.length > 0);
+        return res.status(200).json({
+            success: true,
+            message: "Lifecycle fetched successfully.",
+            lifecycle: filteredLifecycles,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
 //function to fetch lifecycle by id
 export const fetchLifecycleById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -336,9 +357,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         </tr>
         <tr>
           <th>Price</th>
-          <td>${findStage.price
-            ? findStage.price
-            : "-"}</td>
+          <td>${findStage.price ? findStage.price : "-"}</td>
         </tr>
         <tr>
           <th>Phone number</th>

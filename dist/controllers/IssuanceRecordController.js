@@ -159,6 +159,39 @@ export const fetchIssuanceRecords = (req, res) => __awaiter(void 0, void 0, void
     }
 });
 //function to fetch issuance records with lot id
+export const fetchIssuanceRecordsWithUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id } = req.body;
+    try {
+        const issuanceRecord = yield Issuance.find({ allotTo: user_id })
+            .populate({
+            path: "lot",
+            select: "lotNo",
+        })
+            .populate({
+            path: "allotTo allotBy",
+            select: "name phoneNo",
+        });
+        const lotIds = [
+            ...new Set(issuanceRecord.map((issuance) => issuance.lot._id)),
+        ];
+        const lifecycleRecords = yield Lifecycle.find({ _id: { $in: lotIds } });
+        const issuanceWithStageDetails = issuanceRecord.map((issuance) => {
+            const lifecycle = lifecycleRecords.find((l) => l._id.toString() === issuance.lot._id.toString());
+            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => stage._id.toString() === issuance.stage.toString());
+            return Object.assign(Object.assign({}, issuance.toObject()), { stageDetails: stageDetails || null });
+        });
+        res.json({
+            success: true,
+            message: "Issuance Records fetched successfully.",
+            issuanceRecords: issuanceWithStageDetails,
+            count: issuanceWithStageDetails.length,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+//function to fetch issuance records with lot id
 export const fetchIssuanceRecordsWitId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
