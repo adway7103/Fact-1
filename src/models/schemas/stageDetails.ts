@@ -24,7 +24,8 @@ export interface StageDetails {
   name?: string;
   contact?: string;
   isCompleted: boolean;
-  additionalInformation: string;
+  additionalInformation?: string;
+  lostPieces?: number;
 }
 
 //define StageDetailsSchema schema
@@ -73,6 +74,10 @@ export const StageDetailsSchema = new mongoose.Schema<StageDetails>({
   },
   additionalInformation: {
     type: String,
+    required: false,
+  },
+  lostPieces: {
+    type: Number,
     required: false,
   },
 });
