@@ -25,9 +25,6 @@ const LifecycleSchema = new mongoose.Schema({
     stages: {
         type: [StageDetailsSchema],
         required: true,
-    }, completionDate: {
-        type: Date,
-        required: false,
     },
 }, {
     timestamps: true,

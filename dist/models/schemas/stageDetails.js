@@ -60,4 +60,8 @@ export const StageDetailsSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    lostPieces: {
+        type: Number,
+        required: false,
+    },
 });

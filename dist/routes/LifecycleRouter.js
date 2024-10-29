@@ -6,7 +6,7 @@ router
     .post("/:id/new-stage", startLifecycleNewStage)
     .get("/get-all-lifecycle", fetchLifecycles)
     .get("/getLifecycleById/:id", fetchLifecycleById)
-    .get("/get-my-stages/", fetchUserAssignedLifecycles)
+    .get("/get-my-stages", fetchUserAssignedLifecycles)
     .put("/update/:id/:stageId", updateLifecycle)
     .get("/generate-pdf/:id/:stageId", generatePdf)
     .delete("/delete-all", deleteAllLifecycles);

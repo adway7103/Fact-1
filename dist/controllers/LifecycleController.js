@@ -25,12 +25,18 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
         });
     }
     for (const stage of stages) {
-        const { expectedDeliveryDate, assignTo, name, contact, price } = stage;
+        const { expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, } = stage;
         // Validate expectedDeliveryDate
         if (!expectedDeliveryDate) {
             return res.status(400).json({
                 success: false,
                 message: "The Expected Delivery Date is required.",
+            });
+        }
+        if (!additionalInformation) {
+            return res.status(400).json({
+                success: false,
+                message: "The additionalInformation is required.",
             });
         }
         if (!price) {
@@ -167,7 +173,7 @@ export const fetchLifecycleById = (req, res) => __awaiter(void 0, void 0, void 0
 //update stage
 export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id, stageId } = req.params;
-    const { isCompleted, markAsDone } = req.body;
+    const { isCompleted, markAsDone, noOfPieces, lostPieces } = req.body;
     try {
         const lifecycle = yield Lifecycle.findById(id);
         if (!lifecycle) {
@@ -176,6 +182,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
                 message: "Lifecycle not found.",
             });
         }
+        lifecycle.rolls[0].noOfPieces = Number(noOfPieces);
         const stage = lifecycle.stages.find((stage) => {
             return stage._id.toString() === stageId;
         });
@@ -193,17 +200,10 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
             stage.endTime = undefined;
         }
         stage.isCompleted = isCompleted;
-        // Update end time if completed
-        if (isCompleted) {
-            stage.endTime = new Date();
-        }
-        else {
-            stage.endTime = undefined;
-        }
+        stage.lostPieces = Number(lostPieces);
         if (markAsDone &&
             lifecycle.stages[lifecycle.stages.length - 1]._id.toString() === stageId) {
             lifecycle.markAsDone = true;
-            lifecycle.completionDate = new Date(); // Set completion date for the entire lifecycle
         }
         yield lifecycle.save();
         return res.status(200).json({
@@ -280,6 +280,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
                 message: "The Assign To field must be a valid ObjectId.",
             });
         }
+        console.log(additionalInformation);
         const newStage = {
             stage: stage.toLowerCase(),
             startTime: new Date(),
