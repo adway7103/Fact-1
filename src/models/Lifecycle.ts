@@ -15,9 +15,8 @@ interface ILifecycle extends mongoose.Document {
   rolls: LifeCycleDetails[];
   markAsDone: boolean;
   lotNo: string;
-//   currentStage: StageEnum;
+  //   currentStage: StageEnum;
   stages: StageDetails[];
-  completionDate?: Date; // Add this line
 }
 
 // Create the ILifecycle schema
@@ -44,10 +43,7 @@ const LifecycleSchema = new mongoose.Schema<ILifecycle>(
     stages: {
       type: [StageDetailsSchema],
       required: true,
-    }, completionDate: {
-        type: Date,
-        required: false,
-      },
+    },
   },
   {
     timestamps: true,
