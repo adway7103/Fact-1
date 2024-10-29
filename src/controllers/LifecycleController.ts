@@ -13,7 +13,6 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
   const uuid = uuidv4();
   const lotNumber = `LN-${uuid.slice(0, 4)}`;
   let { rolls, markAsDone, stages } = req.body;
-
   if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
     return res.status(400).json({
       success: false,
@@ -22,13 +21,26 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
   }
 
   for (const stage of stages) {
-    const { expectedDeliveryDate, assignTo, name, contact, price } = stage;
+    const {
+      expectedDeliveryDate,
+      assignTo,
+      name,
+      contact,
+      price,
+      additionalInformation,
+    } = stage;
 
     // Validate expectedDeliveryDate
     if (!expectedDeliveryDate) {
       return res.status(400).json({
         success: false,
         message: "The Expected Delivery Date is required.",
+      });
+    }
+    if (!additionalInformation) {
+      return res.status(400).json({
+        success: false,
+        message: "The additionalInformation is required.",
       });
     }
     if (!price) {
@@ -66,6 +78,7 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
         });
       }
     }
+
     stage.startTime = new Date();
   }
 
@@ -190,7 +203,7 @@ export const fetchLifecycleById = async (req: Request, res: Response) => {
 //update stage
 export const updateLifecycle = async (req: Request, res: Response) => {
   const { id, stageId } = req.params;
-  const { isCompleted, markAsDone } = req.body;
+  const { isCompleted, markAsDone, noOfPieces, lostPieces } = req.body;
 
   try {
     const lifecycle = await Lifecycle.findById(id);
@@ -201,7 +214,7 @@ export const updateLifecycle = async (req: Request, res: Response) => {
         message: "Lifecycle not found.",
       });
     }
-
+    lifecycle.rolls[0].noOfPieces = Number(noOfPieces);
     const stage = lifecycle.stages.find((stage: any) => {
       return stage._id.toString() === stageId;
     });
@@ -221,20 +234,13 @@ export const updateLifecycle = async (req: Request, res: Response) => {
     }
 
     stage.isCompleted = isCompleted;
-
-    // Update end time if completed
-    if (isCompleted) {
-      stage.endTime = new Date();
-    } else {
-      stage.endTime = undefined;
-    }
+    stage.lostPieces = Number(lostPieces);
 
     if (
       markAsDone &&
       lifecycle.stages[lifecycle.stages.length - 1]._id.toString() === stageId
     ) {
       lifecycle.markAsDone = true;
-      lifecycle.completionDate = new Date(); // Set completion date for the entire lifecycle
     }
 
     await lifecycle.save();
@@ -329,7 +335,6 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
         message: "The Assign To field must be a valid ObjectId.",
       });
     }
-
     const newStage: StageDetails = {
       stage: stage.toLowerCase(),
       startTime: new Date(),
