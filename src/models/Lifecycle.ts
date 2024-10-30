@@ -9,12 +9,15 @@ import {
   LifecycleDetailsSchema,
   LifeCycleDetails,
 } from "./schemas/lifecycleDetailsSchema.js";
-
-// Define the ILifecycle interface
+interface TypeEnum {
+  Kids: "kids";
+  Adult: "adult";
+}
 interface ILifecycle extends mongoose.Document {
   rolls: LifeCycleDetails[];
   markAsDone: boolean;
   lotNo: string;
+  type: TypeEnum;
   //   currentStage: StageEnum;
   stages: StageDetails[];
 }
@@ -33,6 +36,11 @@ const LifecycleSchema = new mongoose.Schema<ILifecycle>(
     markAsDone: {
       type: Boolean,
       default: false,
+    },
+    type: {
+      type: String,
+
+      required: true,
     },
     // currentStage: {
     //   type: String,
