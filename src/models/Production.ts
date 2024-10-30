@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import "dotenv/config";
 
+export interface TypeEnum {
+  Kids: "kids";
+  Adult: "adult";
+}
 // Define the ProductionDetails interface
 interface ProductionDetails {
   costPrice: number;
@@ -20,6 +24,7 @@ interface IProduction extends mongoose.Document {
   expectedDeliveryDate: string;
   assignTo?: mongoose.Types.ObjectId | null; // Allow null or undefined
   markAsDone: boolean; // New field
+  type: TypeEnum;
 }
 
 // Create the ProductionDetails schema
@@ -86,6 +91,10 @@ const ProductionSchema = new mongoose.Schema<IProduction>(
       type: Boolean,
       default: false, // Default is false (not done)
     },
+    type: {
+      type: String,
+      required: true,
+    }
   },
   {
     timestamps: true, // Add timestamps to the schema
