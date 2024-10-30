@@ -62,6 +62,10 @@ const ProductionSchema = new mongoose.Schema({
         type: Boolean,
         default: false, // Default is false (not done)
     },
+    type: {
+        type: String,
+        required: true,
+    }
 }, {
     timestamps: true, // Add timestamps to the schema
 });

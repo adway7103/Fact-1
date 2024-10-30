@@ -16,6 +16,10 @@ const LifecycleSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    type: {
+        type: String,
+        required: true,
+    },
     // currentStage: {
     //   type: String,
     //   enum: Object.values(StageEnum),

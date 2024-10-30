@@ -17,7 +17,7 @@ import pdf from "html-pdf-node"; // Import html-pdf-node
 export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const uuid = uuidv4();
     const lotNumber = `LN-${uuid.slice(0, 4)}`;
-    let { rolls, markAsDone, stages } = req.body;
+    let { rolls, markAsDone, stages, type } = req.body;
     if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
         return res.status(400).json({
             success: false,
@@ -31,6 +31,12 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
             return res.status(400).json({
                 success: false,
                 message: "The Expected Delivery Date is required.",
+            });
+        }
+        if (!type) {
+            return res.status(400).json({
+                success: false,
+                message: "The type is required.",
             });
         }
         if (!additionalInformation) {
@@ -78,6 +84,7 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
             rolls,
             markAsDone: markAsDone || false,
             lotNo: lotNumber,
+            type: type,
             stages,
         });
         const savedLifecycle = yield newLifecycle.save();
@@ -223,7 +230,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
 // Function to start a new stage
 export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, } = req.body;
+    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, type, } = req.body;
     try {
         const lifecycle = yield Lifecycle.findById(id);
         if (!lifecycle) {
@@ -238,6 +245,12 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             return res.status(400).json({
                 success: false,
                 message: `The stage '${stage}' already created in this lifecycle.`,
+            });
+        }
+        if (!type) {
+            return res.status(400).json({
+                success: false,
+                message: `The type is required`,
             });
         }
         if (!assignTo) {
@@ -280,7 +293,6 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
                 message: "The Assign To field must be a valid ObjectId.",
             });
         }
-        console.log(additionalInformation);
         const newStage = {
             stage: stage.toLowerCase(),
             startTime: new Date(),
@@ -357,10 +369,6 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
           <td>${findStage.assignTo ? findStage.assignTo.name : findStage.name}</td>
         </tr>
         <tr>
-          <th>Price</th>
-          <td>${findStage.price ? findStage.price : "-"}</td>
-        </tr>
-        <tr>
           <th>Phone number</th>
           <td>${findStage.assignTo ? findStage.assignTo.phoneNo : findStage.contact}</td>
         </tr>
@@ -403,7 +411,6 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
           <h1>Lifecycle Stage Details</h1>
           <h2>Lot Number: ${lifecycle.lotNo}</h2>
           ${rollTables} 
-         
         </body>
       </html>
     `;

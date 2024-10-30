@@ -14,7 +14,7 @@ import mongoose from "mongoose";
 import pdf from "html-pdf-node"; // Import html-pdf-node
 // Function to create a new production and delete the roll from inventory
 export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone } = req.body;
+    let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone, type, } = req.body;
     if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
         return res.status(400).json({
             success: false,
@@ -50,6 +50,12 @@ export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0
             message: "The Expected Delivery Date is required.",
         });
     }
+    if (!type) {
+        return res.status(400).json({
+            success: false,
+            message: "The type is required.",
+        });
+    }
     try {
         // Create the new production
         const newProduction = new ProductionModel({
@@ -59,6 +65,7 @@ export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0
             expectedDeliveryDate,
             assignTo,
             markAsDone: markAsDone || false,
+            type,
         });
         const savedProduction = yield newProduction.save();
         //deleting roll based on rollNum after starting production.
