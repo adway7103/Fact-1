@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import "dotenv/config";
 
-export interface TypeEnum {
+interface TypeEnum {
   Kids: "kids";
   Adult: "adult";
 }
