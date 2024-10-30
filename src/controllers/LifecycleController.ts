@@ -12,7 +12,7 @@ import pdf from "html-pdf-node"; // Import html-pdf-node
 export const startNewLifecycle = async (req: Request, res: Response) => {
   const uuid = uuidv4();
   const lotNumber = `LN-${uuid.slice(0, 4)}`;
-  let { rolls, markAsDone, stages } = req.body;
+  let { rolls, markAsDone, stages, type } = req.body;
   if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
     return res.status(400).json({
       success: false,
@@ -35,6 +35,12 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: "The Expected Delivery Date is required.",
+      });
+    }
+    if (!type) {
+      return res.status(400).json({
+        success: false,
+        message: "The type is required.",
       });
     }
     if (!additionalInformation) {
@@ -88,6 +94,7 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
       rolls,
       markAsDone: markAsDone || false,
       lotNo: lotNumber,
+      type: type,
       stages,
     });
 
@@ -270,6 +277,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
     contact,
     price,
     additionalInformation,
+    type,
   } = req.body;
 
   try {
@@ -290,6 +298,12 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: `The stage '${stage}' already created in this lifecycle.`,
+      });
+    }
+    if (!type) {
+      return res.status(400).json({
+        success: false,
+        message: `The type is required`,
       });
     }
 
@@ -432,10 +446,6 @@ export const generatePdf = async (req: Request, res: Response) => {
           }</td>
         </tr>
         <tr>
-          <th>Price</th>
-          <td>${findStage.price ? findStage.price : "-"}</td>
-        </tr>
-        <tr>
           <th>Phone number</th>
           <td>${
             findStage.assignTo ? findStage.assignTo.phoneNo : findStage.contact
@@ -483,7 +493,6 @@ export const generatePdf = async (req: Request, res: Response) => {
           <h1>Lifecycle Stage Details</h1>
           <h2>Lot Number: ${lifecycle.lotNo}</h2>
           ${rollTables} 
-         
         </body>
       </html>
     `;
