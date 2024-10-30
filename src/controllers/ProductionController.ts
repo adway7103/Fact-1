@@ -9,8 +9,15 @@ import pdf from "html-pdf-node"; // Import html-pdf-node
 
 // Function to create a new production and delete the roll from inventory
 export const startNewProduction = async (req: Request, res: Response) => {
-  let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone } =
-    req.body;
+  let {
+    rolls,
+    name,
+    contact,
+    expectedDeliveryDate,
+    assignTo,
+    markAsDone,
+    type,
+  } = req.body;
 
   if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
     return res.status(400).json({
@@ -50,6 +57,12 @@ export const startNewProduction = async (req: Request, res: Response) => {
       message: "The Expected Delivery Date is required.",
     });
   }
+  if (!type) {
+    return res.status(400).json({
+      success: false,
+      message: "The type is required.",
+    });
+  }
 
   try {
     // Create the new production
@@ -60,6 +73,7 @@ export const startNewProduction = async (req: Request, res: Response) => {
       expectedDeliveryDate,
       assignTo,
       markAsDone: markAsDone || false,
+      type,
     });
 
     const savedProduction = await newProduction.save();
