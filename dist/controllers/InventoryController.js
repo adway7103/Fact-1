@@ -101,6 +101,7 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     .json({ error: "Extra fields should be an array" });
             }
         }
+        //chek existing roll number
         const rollNumberField = extra_fields.find((field) => field.hasOwnProperty("roll_number"));
         const rollNumber = rollNumberField ? rollNumberField["roll_number"] : null;
         if (rollNumber) {
@@ -110,6 +111,19 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
             if (existingInventory) {
                 return res.status(400).json({
                     error: `Roll number ${rollNumber} already exists in the inventory.`,
+                });
+            }
+        }
+        //check existing color
+        const colorField = extra_fields.find((field) => field.hasOwnProperty("color"));
+        const color = colorField ? colorField["color"] : null;
+        if (color) {
+            const existingInventory = yield Inventory.findOne({
+                "extra_fields.color": color,
+            });
+            if (existingInventory) {
+                return res.status(400).json({
+                    error: `${color} color already exists in the inventory.`,
                 });
             }
         }

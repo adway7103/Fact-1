@@ -15,7 +15,7 @@ const IssuanceSchema = new mongoose.Schema({
     inventory: {
         type: String,
         required: true,
-        enum: ["accessories", "astar"],
+        enum: ["accessories", "astar", "thread"],
     },
     inventoryItem: {
         type: String,

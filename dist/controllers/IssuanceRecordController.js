@@ -76,7 +76,7 @@ export const issueInventoryItems = (req, res) => __awaiter(void 0, void 0, void 
         // Find the inventory item based on inventory and inventoryItem fields
         const inventoryItemToUpdate = yield Inventory.findOne({
             sub_category: inventory,
-            name: inventoryItem,
+            $or: [{ name: inventoryItem }, { "extra_fields.0.color": inventoryItem }],
         });
         if (!inventoryItemToUpdate) {
             return res.status(404).json({
@@ -131,19 +131,19 @@ export const fetchIssuanceRecords = (req, res) => __awaiter(void 0, void 0, void
     try {
         const issuanceRecords = yield Issuance.find()
             .populate({
-            path: "lot",
-            select: "lotNo",
-        })
-            .populate({
             path: "allotTo allotBy",
             select: "name phoneNo",
+        })
+            .populate({
+            path: "lot",
+            select: "lotNo",
         });
         const lotIds = [
-            ...new Set(issuanceRecords.map((issuance) => issuance.lot._id)),
+            ...new Set(issuanceRecords.map((issuance) => { var _a; return (_a = issuance.lot) === null || _a === void 0 ? void 0 : _a._id; })),
         ];
         const lifecycleRecords = yield Lifecycle.find({ _id: { $in: lotIds } });
         const issuanceWithStageDetails = issuanceRecords.map((issuance) => {
-            const lifecycle = lifecycleRecords.find((l) => l._id.toString() === issuance.lot._id.toString());
+            const lifecycle = lifecycleRecords.find((l) => { var _a; return l._id.toString() === ((_a = issuance.lot) === null || _a === void 0 ? void 0 : _a._id.toString()); });
             const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => stage._id.toString() === issuance.stage.toString());
             return Object.assign(Object.assign({}, issuance.toObject()), { stageDetails: stageDetails || null });
         });
@@ -151,7 +151,7 @@ export const fetchIssuanceRecords = (req, res) => __awaiter(void 0, void 0, void
             success: true,
             message: "Issuance Records fetched successfully.",
             issuanceRecords: issuanceWithStageDetails,
-            count: issuanceWithStageDetails.length,
+            //   count: issuanceWithStageDetails.length,
         });
     }
     catch (error) {

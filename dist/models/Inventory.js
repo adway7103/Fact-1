@@ -11,6 +11,7 @@ export var RawSubCategory;
     RawSubCategory["Roll"] = "roll";
     RawSubCategory["Astar"] = "astar";
     RawSubCategory["Accessories"] = "accessories";
+    RawSubCategory["Thread"] = "thread";
 })(RawSubCategory || (RawSubCategory = {}));
 const InventorySchema = new mongoose.Schema({
     name: {
