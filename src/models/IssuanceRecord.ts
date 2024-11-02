@@ -5,7 +5,7 @@ import "dotenv/config";
 interface IIssuance extends mongoose.Document {
   lot: mongoose.Types.ObjectId;
   stage: mongoose.Types.ObjectId;
-  inventory: "accessories" | "astar";
+  inventory: "accessories" | "astar" | "thread";
   inventoryItem: string;
   quantity: number;
   totalQuantity: number;
@@ -32,7 +32,7 @@ const IssuanceSchema = new mongoose.Schema<IIssuance>(
     inventory: {
       type: String,
       required: true,
-      enum: ["accessories", "astar"],
+      enum: ["accessories", "astar", "thread"],
     },
     inventoryItem: {
       type: String,
