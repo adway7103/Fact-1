@@ -11,6 +11,7 @@ export enum RawSubCategory {
   Roll = "roll",
   Astar = "astar",
   Accessories = "accessories",
+  Thread = "thread",
 }
 
 interface ExtraField {
