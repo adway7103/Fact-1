@@ -125,6 +125,7 @@ export const addItem = async (req: Request, res: Response) => {
       }
     }
 
+    //chek existing roll number
     const rollNumberField = extra_fields.find((field: any) =>
       field.hasOwnProperty("roll_number")
     );
@@ -143,10 +144,30 @@ export const addItem = async (req: Request, res: Response) => {
       }
     }
 
+    //check existing color
+    const colorField = extra_fields.find((field: any) =>
+      field.hasOwnProperty("color")
+    );
+
+    const color = colorField ? colorField["color"] : null;
+
+    if (color) {
+      const existingInventory = await Inventory.findOne({
+        "extra_fields.color": color,
+      });
+
+      if (existingInventory) {
+        return res.status(400).json({
+          error: `${color} color already exists in the inventory.`,
+        });
+      }
+    }
+
     const item = await Inventory.create({
       name,
       quantity,
       price,
+
       min_limit,
       image_url,
       inventory_type: mappedInventoryType,
