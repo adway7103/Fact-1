@@ -82,7 +82,7 @@ export const issueInventoryItems = async (req: Request, res: Response) => {
     // Find the inventory item based on inventory and inventoryItem fields
     const inventoryItemToUpdate = await Inventory.findOne({
       sub_category: inventory,
-      name: inventoryItem,
+      $or: [{ name: inventoryItem }, { "extra_fields.0.color": inventoryItem }],
     });
 
     if (!inventoryItemToUpdate) {
@@ -141,23 +141,23 @@ export const fetchIssuanceRecords = async (req: Request, res: Response) => {
   try {
     const issuanceRecords = await Issuance.find()
       .populate({
-        path: "lot",
-        select: "lotNo",
-      })
-      .populate({
         path: "allotTo allotBy",
         select: "name phoneNo",
+      })
+      .populate({
+        path: "lot",
+        select: "lotNo",
       });
 
     const lotIds = [
-      ...new Set(issuanceRecords.map((issuance) => issuance.lot._id)),
+      ...new Set(issuanceRecords.map((issuance) => issuance.lot?._id)),
     ];
 
     const lifecycleRecords = await Lifecycle.find({ _id: { $in: lotIds } });
 
     const issuanceWithStageDetails = issuanceRecords.map((issuance) => {
       const lifecycle = lifecycleRecords.find(
-        (l) => l._id.toString() === issuance.lot._id.toString()
+        (l) => l._id.toString() === issuance.lot?._id.toString()
       );
 
       const stageDetails = lifecycle?.stages.find(
@@ -174,7 +174,7 @@ export const fetchIssuanceRecords = async (req: Request, res: Response) => {
       success: true,
       message: "Issuance Records fetched successfully.",
       issuanceRecords: issuanceWithStageDetails,
-      count: issuanceWithStageDetails.length,
+      //   count: issuanceWithStageDetails.length,
     });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
