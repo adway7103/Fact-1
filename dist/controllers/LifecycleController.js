@@ -17,7 +17,7 @@ import pdf from "html-pdf-node"; // Import html-pdf-node
 export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const uuid = uuidv4();
     const lotNumber = `LN-${uuid.slice(0, 4)}`;
-    let { rolls, markAsDone, stages, type } = req.body;
+    let { rolls, markAsDone, stages, type, brand, accessories, mainThread, contrastThread, insideThread, washCard, embroidery, zip, } = req.body;
     if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
         return res.status(400).json({
             success: false,
@@ -86,6 +86,14 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
             lotNo: lotNumber,
             type: type,
             stages,
+            brand,
+            accessories,
+            mainThread,
+            contrastThread,
+            insideThread,
+            washCard,
+            embroidery,
+            zip,
         });
         const savedLifecycle = yield newLifecycle.save();
         for (const roll of rolls) {
@@ -230,7 +238,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
 // Function to start a new stage
 export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, type, } = req.body;
+    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, } = req.body;
     try {
         const lifecycle = yield Lifecycle.findById(id);
         if (!lifecycle) {
@@ -245,12 +253,6 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             return res.status(400).json({
                 success: false,
                 message: `The stage '${stage}' already created in this lifecycle.`,
-            });
-        }
-        if (!type) {
-            return res.status(400).json({
-                success: false,
-                message: `The type is required`,
             });
         }
         if (!assignTo) {
@@ -320,7 +322,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
         });
     }
 });
-//generate production challan
+//generate lifecycle stage challan
 export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id, stageId } = req.params;
@@ -346,7 +348,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
             return `${day}/${month}/${year}`;
         }
         // HTML content for the PDF
-        const rollTables = `
+        const stageTable = `
       <h3>Stage: ${findStage.stage}</h2>
 
       <table>
@@ -381,6 +383,48 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
       </table>
       <br/>
     `;
+        const inventorySpecification = `
+    <table>
+      <tr>
+        <th>Type</th>
+        <td>${lifecycle.type ? lifecycle.type : "-"}</td>
+      </tr>
+      <tr>
+        <th>Brand</th>
+        <td>${lifecycle.brand ? lifecycle.brand : "-"}</td>
+      </tr>
+      <tr>
+        <th>Accessories</th>
+        <td>${lifecycle.accessories ? lifecycle.accessories : "-"}</td>
+      </tr>
+       <tr>
+        <th>Main Thread</th>
+        <td>${lifecycle.mainThread ? lifecycle.mainThread : "-"}</td>
+      </tr>
+     <tr>
+        <th>Contrast Thread</th>
+        <td>${lifecycle.contrastThread ? lifecycle.contrastThread : "-"}</td>
+      </tr>
+     <tr>
+        <th>Inside Thread</th>
+        <td>${lifecycle.insideThread ? lifecycle.insideThread : "-"}</td>
+      </tr>
+     <tr>
+        <th>Wash Card</th>
+        <td>${lifecycle.washCard ? lifecycle.washCard : "-"}</td>
+      </tr>
+     <tr>
+        <th>Embroidery</th>
+        <td>${lifecycle.embroidery ? lifecycle.embroidery : "-"}</td>
+      </tr>
+     <tr>
+        <th>Zip</th>
+        <td>${lifecycle.zip ? lifecycle.zip : "-"}</td>
+      </tr>
+     
+    </table>
+    <br/>
+  `;
         // HTML content for the PDF
         const htmlContent = `
       <html>
@@ -389,6 +433,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
             body { font-family: Arial, sans-serif; margin: 20px; }
             h1 { text-align: center; }
             h2 { text-align: center; }
+            h4 { text-align: center; }
             h3 { margin-top: 20px; }
             table { 
               width: 100%; 
@@ -410,7 +455,10 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <body>
           <h1>Lifecycle Stage Details</h1>
           <h2>Lot Number: ${lifecycle.lotNo}</h2>
-          ${rollTables} 
+          <h4>Roll Number: ${lifecycle.rolls[0].rollNo}</h4>
+          ${stageTable} 
+          <h3>Inventory specification</h3>
+          ${inventorySpecification}
         </body>
       </html>
     `;

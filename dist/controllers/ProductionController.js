@@ -235,10 +235,6 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <th>Meter</th>
         <td>${roll.meter}</td>
       </tr>
-      <tr>
-        <th>Price</th>
-        <td>₹ ${roll.price}</td>
-      </tr>
     </table>
     <br/>
   `)
@@ -277,6 +273,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <h2>Other Details</h2>
         <p>Start Date: ${formatDate(production.createdAt)}</p>
         <p>Expected Delivery Date: ${production.expectedDeliveryDate}</p>
+        <p>Delivery Date: ${production.markAsDone === true ? formatDate(production.updatedAt) : "-"}</p>
       </body>
     </html>
   `;
