@@ -123,12 +123,28 @@ export const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 export const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { delete_user_id } = req.body;
-        const deletedUser = yield User.findByIdAndDelete(delete_user_id);
-        if (!deletedUser) {
-            return res.status(404).json({ message: "User not found" });
+        const { delete_user_id, adminPassword, user_id } = req.body;
+        if (!delete_user_id || !adminPassword || !user_id) {
+            return res.status(400).json({ error: "Missing required fields" });
         }
-        return res.status(200).json({ message: "Deleted successfully" });
+        if (delete_user_id === user_id) {
+            return res.status(400).json({ error: "Admin cannot delete themselves" });
+        }
+        const user = yield User.findById(user_id).select("name password");
+        if (!user) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+        const isPsswordMatch = yield bcrypt.compare(adminPassword, user.password);
+        if (!isPsswordMatch) {
+            return res.status(400).json({ error: "Admin password is wrong" });
+        }
+        const deletedUser = yield User.findByIdAndDelete(delete_user_id).select("name");
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User to be deleted not found" });
+        }
+        return res.status(200).json({
+            message: `${deletedUser.name} Deleted successfully by ${user.name}`,
+        });
     }
     catch (error) {
         return res.status(500).json({ error: "Internal server error" });
