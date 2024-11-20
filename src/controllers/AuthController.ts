@@ -110,12 +110,11 @@ export const editUser = async (req: Request, res: Response) => {
       return res.status(200).json({ user });
     }
     return res.status(404).json({ error: "User not found" });
-    
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
-    
   }
-}
+};
+
 export const fetchUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.find();
@@ -123,7 +122,7 @@ export const fetchUsers = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -134,21 +133,44 @@ export const getUser = async (req: Request, res: Response) => {
     }
     return res.status(404).json({ error: "User not found" });
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
-}
+};
+
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { delete_user_id} = req.body;
-    const deletedUser = await User.findByIdAndDelete(delete_user_id);
+    const { delete_user_id, adminPassword, user_id } = req.body;
 
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
+    if (!delete_user_id || !adminPassword || !user_id) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
-    return res.status(200).json({ message: "Deleted successfully" });
+    if (delete_user_id === user_id) {
+      return res.status(400).json({ error: "Admin cannot delete themselves" });
+    }
+
+    const user = await User.findById(user_id).select("name password");
+    if (!user) {
+      return res.status(404).json({ error: "Admin not found" });
+    }
+
+    const isPsswordMatch = await bcrypt.compare(adminPassword, user.password);
+    if (!isPsswordMatch) {
+      return res.status(400).json({ error: "Admin password is wrong" });
+    }
+
+    const deletedUser = await User.findByIdAndDelete(delete_user_id).select(
+      "name"
+    );
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User to be deleted not found" });
+    }
+
+    return res.status(200).json({
+      message: `${deletedUser.name} Deleted successfully by ${user.name}`,
+    });
   } catch (error: any) {
     return res.status(500).json({ error: "Internal server error" });
   }
-}
+};

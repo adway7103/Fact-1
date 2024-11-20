@@ -21,7 +21,7 @@ router.put("/edit-user/:id", authenticate, editUser);
 router.delete(
   "/delete-user",
   authenticate,
-  checkPermissions("delete-user"),
+  // checkPermissions("delete-user"),
   deleteUser
 );
 // router.post("/add-user", registerC);
