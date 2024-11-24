@@ -46,5 +46,7 @@ const InventorySchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.Mixed],
         required: false,
     },
+}, {
+    timestamps: true,
 });
 export default mongoose.model("Inventory", InventorySchema);

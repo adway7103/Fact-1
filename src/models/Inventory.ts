@@ -30,39 +30,44 @@ interface Inventory extends mongoose.Document {
   extra_fields?: ExtraField[];
 }
 
-const InventorySchema = new mongoose.Schema<Inventory>({
-  name: {
-    type: String,
-  },
-  quantity: {
-    type: Number,
-  },
-  price: {
-    type: Number,
-  },
-  min_limit: {
-    type: Number,
-  },
-  image_url: {
-    type: String,
-  },
-  inventory_type: {
-    type: String,
-    required: true,
-    enum: Object.values(InventoryType),
-    default: InventoryType.Raw,
-  },
-  sub_category: {
-    type: String,
-    enum: Object.values(RawSubCategory),
-    required: function () {
-      return this.inventory_type === InventoryType.Raw;
+const InventorySchema = new mongoose.Schema<Inventory>(
+  {
+    name: {
+      type: String,
+    },
+    quantity: {
+      type: Number,
+    },
+    price: {
+      type: Number,
+    },
+    min_limit: {
+      type: Number,
+    },
+    image_url: {
+      type: String,
+    },
+    inventory_type: {
+      type: String,
+      required: true,
+      enum: Object.values(InventoryType),
+      default: InventoryType.Raw,
+    },
+    sub_category: {
+      type: String,
+      enum: Object.values(RawSubCategory),
+      required: function () {
+        return this.inventory_type === InventoryType.Raw;
+      },
+    },
+    extra_fields: {
+      type: [mongoose.Schema.Types.Mixed],
+      required: false,
     },
   },
-  extra_fields: {
-    type: [mongoose.Schema.Types.Mixed],
-    required: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 export default mongoose.model<Inventory>("Inventory", InventorySchema);
