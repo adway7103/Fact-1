@@ -14,15 +14,34 @@ export const notification = (req, res) => __awaiter(void 0, void 0, void 0, func
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
-    const tomorrowStr = `${tomorrow.getDate()}/${tomorrow.getMonth() + 1}/${tomorrow.getFullYear()}`;
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+    const todayStr = formatter.format(today);
+    const tomorrowStr = formatter.format(tomorrow);
     const notifications = [];
     //production
-    const productionDueTomorrow = yield ProductionModel.find({
+    const productionDue = yield ProductionModel.find({
         markAsDone: false,
-        expectedDeliveryDate: tomorrowStr,
+        expectedDeliveryDate: { $in: [todayStr, tomorrowStr] },
     });
-    if (productionDueTomorrow.length > 0) {
-        const productionNotification = productionDueTomorrow
+    if (productionDue.length > 0) {
+        const productionTodayNotification = productionDue
+            .filter((production) => production.expectedDeliveryDate === todayStr)
+            .map((production) => {
+            return production.rolls.map((roll) => {
+                return {
+                    type: "production",
+                    id: production._id,
+                    message: `The Roll number ${roll.rollNo} cutting is expected to be delivered today ${production.expectedDeliveryDate}.`,
+                };
+            });
+        })
+            .flat();
+        const productionTomorrowNotification = productionDue
+            .filter((production) => production.expectedDeliveryDate === tomorrowStr)
             .map((production) => {
             return production.rolls.map((roll) => {
                 return {
@@ -33,13 +52,7 @@ export const notification = (req, res) => __awaiter(void 0, void 0, void 0, func
             });
         })
             .flat();
-        notifications.unshift(...productionNotification);
-    }
-    else {
-        return res.status(200).json({
-            message: "No productions are due tomorrow.",
-            notifications: [],
-        });
+        notifications.push(...productionTodayNotification, ...productionTomorrowNotification);
     }
     //lifecycle
     const unDoneLifecycle = yield Lifecycle.find({ markAsDone: false });
