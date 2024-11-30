@@ -45,6 +45,8 @@ export const registerC = async (req: Request, res: Response) => {
       }
     );
 
+    res.locals.createdDocument = user;
+
     return res.status(201).json({ user, token });
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
@@ -107,6 +109,7 @@ export const editUser = async (req: Request, res: Response) => {
       user.userType = userType || user.userType;
 
       await user.save();
+      res.locals.createdDocument = user;
       return res.status(200).json({ user });
     }
     return res.status(404).json({ error: "User not found" });
@@ -150,7 +153,7 @@ export const deleteUser = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Admin cannot delete themselves" });
     }
 
-    const user = await User.findById(user_id).select("name password");
+    const user = await User.findById(user_id);
     if (!user) {
       return res.status(404).json({ error: "Admin not found" });
     }
@@ -160,12 +163,12 @@ export const deleteUser = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Admin password is wrong" });
     }
 
-    const deletedUser = await User.findByIdAndDelete(delete_user_id).select(
-      "name"
-    );
+    const deletedUser = await User.findByIdAndDelete(delete_user_id);
     if (!deletedUser) {
       return res.status(404).json({ message: "User to be deleted not found" });
     }
+
+    res.locals.createdDocument = deletedUser.toObject();
 
     return res.status(200).json({
       message: `${deletedUser.name} Deleted successfully by ${user.name}`,

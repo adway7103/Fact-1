@@ -92,6 +92,8 @@ export const startNewProduction = async (req: Request, res: Response) => {
       }
     }
 
+    res.locals.createdDocument = savedProduction;
+
     return res.status(201).json({
       success: true,
       message:
@@ -203,6 +205,7 @@ export const updateProductionById = async (req: Request, res: Response) => {
 
     const updatedProduction = await production.save();
 
+    res.locals.createdDocument = updatedProduction;
     return res.status(200).json({
       success: true,
       message: "Production updated successfully.",
@@ -310,7 +313,9 @@ export const generatePdf = async (req: Request, res: Response) => {
         <p>Start Date: ${formatDate(production.createdAt)}</p>
         <p>Expected Delivery Date: ${production.expectedDeliveryDate}</p>
         <p>Delivery Date: ${
-          production.markAsDone === true ? formatDate(production.updatedAt) : "-"
+          production.markAsDone === true
+            ? formatDate(production.updatedAt)
+            : "-"
         }</p>
       </body>
     </html>

@@ -143,6 +143,9 @@ export const startNewLifecycle = async (req: Request, res: Response) => {
         await ProductionModel.findByIdAndDelete(production._id);
       }
     }
+
+    res.locals.createdDocument = savedLifecycle;
+
     return res.status(201).json({
       success: true,
       message: "Lifecycle started successfully.",
@@ -273,6 +276,8 @@ export const updateLifecycle = async (req: Request, res: Response) => {
 
     await lifecycle.save();
 
+    res.locals.createdDocument = lifecycle;
+
     return res.status(200).json({
       success: true,
       message: "Stage updated successfully.",
@@ -380,6 +385,8 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       { $push: { stages: newStage } },
       { new: true }
     );
+
+    res.locals.createdDocument = updateLifecycle;
 
     return res.status(201).json({
       success: true,

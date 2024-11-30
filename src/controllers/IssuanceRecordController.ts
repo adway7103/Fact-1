@@ -121,6 +121,8 @@ export const issueInventoryItems = async (req: Request, res: Response) => {
 
     const savedIssuance = await newIssuance.save();
 
+    res.locals.createdDocument = savedIssuance;
+
     return res.status(201).json({
       success: true,
       message: "Inventory Items Issued Successfully.",

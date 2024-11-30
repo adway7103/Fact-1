@@ -177,6 +177,8 @@ export const addItem = async (req: Request, res: Response) => {
         mappedInventoryType === InventoryType.Raw ? extra_fields : undefined,
     });
 
+    res.locals.createdDocument = item;
+
     return res.status(201).json({ item });
   } catch (error: any) {
     console.log(error);
@@ -215,6 +217,9 @@ export const updateItemQuantity = async (req: Request, res: Response) => {
         severienity: "mid",
       });
     }
+
+    res.locals.createdDocument = item;
+
     return res.status(200).json({ message: "Item Quantity updated" });
   } catch (error: any) {
     return res.status(400).json({ message: "Error occured" });
@@ -231,6 +236,9 @@ export const deleteItem = async (req: Request, res: Response) => {
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
+    
+    res.locals.createdDocument = item;
+
     return res.status(200).json({ message: "Item deleted" });
   } catch (error: any) {
     return res.status(400).json({ message: "Error occured" });

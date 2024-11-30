@@ -20,6 +20,8 @@ export const addTask = async (req: Request, res: Response) => {
       todo_type: todo_type as TodoType,
     });
 
+    res.locals.createdDocument = task;
+
     return res.status(201).json({ task });
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
@@ -50,6 +52,8 @@ export const updateStatus = async (req: Request, res: Response) => {
     if (!updatedTask) {
       return res.status(404).json({ message: "Task not found" });
     }
+
+    res.locals.createdDocument = updatedTask;
 
     return res
       .status(200)
