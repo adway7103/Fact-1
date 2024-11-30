@@ -38,6 +38,7 @@ export const registerC = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "30d",
         });
+        res.locals.createdDocument = user;
         return res.status(201).json({ user, token });
     }
     catch (error) {
@@ -90,6 +91,7 @@ export const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function
             user.phoneNo = phoneNo || user.phoneNo;
             user.userType = userType || user.userType;
             yield user.save();
+            res.locals.createdDocument = user;
             return res.status(200).json({ user });
         }
         return res.status(404).json({ error: "User not found" });
@@ -130,7 +132,7 @@ export const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (delete_user_id === user_id) {
             return res.status(400).json({ error: "Admin cannot delete themselves" });
         }
-        const user = yield User.findById(user_id).select("name password");
+        const user = yield User.findById(user_id);
         if (!user) {
             return res.status(404).json({ error: "Admin not found" });
         }
@@ -138,10 +140,11 @@ export const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (!isPsswordMatch) {
             return res.status(400).json({ error: "Admin password is wrong" });
         }
-        const deletedUser = yield User.findByIdAndDelete(delete_user_id).select("name");
+        const deletedUser = yield User.findByIdAndDelete(delete_user_id);
         if (!deletedUser) {
             return res.status(404).json({ message: "User to be deleted not found" });
         }
+        res.locals.createdDocument = deletedUser.toObject();
         return res.status(200).json({
             message: `${deletedUser.name} Deleted successfully by ${user.name}`,
         });

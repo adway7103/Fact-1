@@ -137,6 +137,7 @@ export const addItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
             sub_category: mappedInventoryType === InventoryType.Raw ? sub_category : undefined,
             extra_fields: mappedInventoryType === InventoryType.Raw ? extra_fields : undefined,
         });
+        res.locals.createdDocument = item;
         return res.status(201).json({ item });
     }
     catch (error) {
@@ -175,6 +176,7 @@ export const updateItemQuantity = (req, res) => __awaiter(void 0, void 0, void 0
                 severienity: "mid",
             });
         }
+        res.locals.createdDocument = item;
         return res.status(200).json({ message: "Item Quantity updated" });
     }
     catch (error) {
@@ -191,6 +193,7 @@ export const deleteItem = (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
         }
+        res.locals.createdDocument = item;
         return res.status(200).json({ message: "Item deleted" });
     }
     catch (error) {

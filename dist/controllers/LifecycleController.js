@@ -114,6 +114,7 @@ export const startNewLifecycle = (req, res) => __awaiter(void 0, void 0, void 0,
                 yield ProductionModel.findByIdAndDelete(production._id);
             }
         }
+        res.locals.createdDocument = savedLifecycle;
         return res.status(201).json({
             success: true,
             message: "Lifecycle started successfully.",
@@ -221,6 +222,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
             lifecycle.markAsDone = true;
         }
         yield lifecycle.save();
+        res.locals.createdDocument = lifecycle;
         return res.status(200).json({
             success: true,
             message: "Stage updated successfully.",
@@ -307,6 +309,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             additionalInformation: additionalInformation ? additionalInformation : "",
         };
         const updatedLifecycle = yield Lifecycle.findByIdAndUpdate(id, { $push: { stages: newStage } }, { new: true });
+        res.locals.createdDocument = updateLifecycle;
         return res.status(201).json({
             success: true,
             message: "Lifecycle stage started successfully.",

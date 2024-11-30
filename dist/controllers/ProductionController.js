@@ -80,6 +80,7 @@ export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0
                 });
             }
         }
+        res.locals.createdDocument = savedProduction;
         return res.status(201).json({
             success: true,
             message: "Production created successfully and roll(s) deleted from inventory.",
@@ -175,6 +176,7 @@ export const updateProductionById = (req, res) => __awaiter(void 0, void 0, void
             });
         }
         const updatedProduction = yield production.save();
+        res.locals.createdDocument = updatedProduction;
         return res.status(200).json({
             success: true,
             message: "Production updated successfully.",
@@ -273,7 +275,9 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <h2>Other Details</h2>
         <p>Start Date: ${formatDate(production.createdAt)}</p>
         <p>Expected Delivery Date: ${production.expectedDeliveryDate}</p>
-        <p>Delivery Date: ${production.markAsDone === true ? formatDate(production.updatedAt) : "-"}</p>
+        <p>Delivery Date: ${production.markAsDone === true
+            ? formatDate(production.updatedAt)
+            : "-"}</p>
       </body>
     </html>
   `;

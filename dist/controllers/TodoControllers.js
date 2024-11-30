@@ -24,6 +24,7 @@ export const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function*
             user: user_id,
             todo_type: todo_type,
         });
+        res.locals.createdDocument = task;
         return res.status(201).json({ task });
     }
     catch (error) {
@@ -49,6 +50,7 @@ export const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!updatedTask) {
             return res.status(404).json({ message: "Task not found" });
         }
+        res.locals.createdDocument = updatedTask;
         return res
             .status(200)
             .json({ message: "Updated successfully", updatedTask });

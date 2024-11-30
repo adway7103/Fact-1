@@ -111,6 +111,7 @@ export const issueInventoryItems = (req, res) => __awaiter(void 0, void 0, void 
             contact,
         });
         const savedIssuance = yield newIssuance.save();
+        res.locals.createdDocument = savedIssuance;
         return res.status(201).json({
             success: true,
             message: "Inventory Items Issued Successfully.",
