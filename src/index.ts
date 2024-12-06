@@ -10,6 +10,7 @@ import lifecycleRouter from "./routes/LifecycleRouter.js";
 import issuanceRouter from "./routes/IssuanceRecordRouter.js";
 import notificationRouter from "./routes/notificationRouter.js";
 import activityLogsRouter from "./routes/LogsRouter.js";
+import uploadRouter from "./routes/uploadRouter.js"
 import cors from "cors";
 import AddPermissions from "./controllers/Rules.js";
 // import roleRouter from "./routes/RoleRouter.js";
@@ -19,16 +20,17 @@ import logMiddleware from "./middleware/logsMiddleware.js";
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(logMiddleware);
+// app.use(logMiddleware);
 
 app.use("/auth", authRouter);
 app.use("/todo", authenticate, TodoRouter);
-app.use("/inventory", authenticate, inventoryRouter);
-app.use("/production", authenticate, productionRouter);
-app.use("/lifecycle", authenticate, lifecycleRouter);
-app.use("/issuance", authenticate, issuanceRouter);
+app.use("/inventory",logMiddleware, authenticate, inventoryRouter);
+app.use("/production",logMiddleware, authenticate, productionRouter);
+app.use("/lifecycle",logMiddleware, authenticate, lifecycleRouter);
+app.use("/issuance",logMiddleware, authenticate, issuanceRouter);
 app.use("/", authenticate, notificationRouter);
 app.use("/", authenticate, activityLogsRouter);
+app.use("/",authenticate, uploadRouter);
 // app.use("/role",authenticate,checkPermissions("add-role"), roleRouter);
 app.post("/role", AddPermissions);
 
