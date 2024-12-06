@@ -568,8 +568,10 @@ export const generatePdf = async (req: Request, res: Response) => {
           ${stageTable} 
           <h3>Inventory specification</h3>
           ${inventorySpecification}
-          <img src="${findStage?.image}" alt="Stage Image" />
-        </body>
+ ${
+   findStage?.image && `<img src="${findStage.image}" alt="Stage Image" />`
+ }     
+    </body>
       </html>
     `;
 
