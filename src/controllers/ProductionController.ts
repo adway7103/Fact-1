@@ -17,6 +17,7 @@ export const startNewProduction = async (req: Request, res: Response) => {
     assignTo,
     markAsDone,
     type,
+    image,
   } = req.body;
 
   if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
@@ -74,6 +75,7 @@ export const startNewProduction = async (req: Request, res: Response) => {
       assignTo,
       markAsDone: markAsDone || false,
       type,
+      image,
     });
 
     const savedProduction = await newProduction.save();
@@ -301,6 +303,11 @@ export const generatePdf = async (req: Request, res: Response) => {
             background-color: #f2f2f2; 
             text-align: left; 
           }
+       img { 
+          width: 200px; 
+          height: 150px; 
+          object-fit: cover;
+        }
         </style>
       </head>
       <body>
@@ -317,6 +324,8 @@ export const generatePdf = async (req: Request, res: Response) => {
             ? formatDate(production.updatedAt)
             : "-"
         }</p>
+              <img src="${production.image}" alt="Production Image" />
+
       </body>
     </html>
   `;

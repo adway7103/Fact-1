@@ -14,7 +14,7 @@ import mongoose from "mongoose";
 import pdf from "html-pdf-node"; // Import html-pdf-node
 // Function to create a new production and delete the roll from inventory
 export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone, type, } = req.body;
+    let { rolls, name, contact, expectedDeliveryDate, assignTo, markAsDone, type, image, } = req.body;
     if (!rolls || !Array.isArray(rolls) || rolls.length === 0) {
         return res.status(400).json({
             success: false,
@@ -66,6 +66,7 @@ export const startNewProduction = (req, res) => __awaiter(void 0, void 0, void 0
             assignTo,
             markAsDone: markAsDone || false,
             type,
+            image,
         });
         const savedProduction = yield newProduction.save();
         //deleting roll based on rollNum after starting production.
@@ -264,6 +265,11 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
             background-color: #f2f2f2; 
             text-align: left; 
           }
+       img { 
+          width: 200px; 
+          height: 150px; 
+          object-fit: cover;
+        }
         </style>
       </head>
       <body>
@@ -278,6 +284,8 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <p>Delivery Date: ${production.markAsDone === true
             ? formatDate(production.updatedAt)
             : "-"}</p>
+              <img src="${production.image}" alt="Production Image" />
+
       </body>
     </html>
   `;

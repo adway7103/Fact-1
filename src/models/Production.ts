@@ -25,6 +25,7 @@ interface IProduction extends mongoose.Document {
   assignTo?: mongoose.Types.ObjectId | null; // Allow null or undefined
   markAsDone: boolean; // New field
   type: TypeEnum;
+  image?: string;
 }
 
 // Create the ProductionDetails schema
@@ -94,7 +95,11 @@ const ProductionSchema = new mongoose.Schema<IProduction>(
     type: {
       type: String,
       required: true,
-    }
+    },
+    image: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true, // Add timestamps to the schema

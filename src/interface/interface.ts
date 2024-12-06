@@ -22,4 +22,5 @@ export interface IProduction {
   markAsDone: boolean;
   createdAt: Date;
   updatedAt: Date;
+  image:string
 }
