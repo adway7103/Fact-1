@@ -454,6 +454,11 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
               background-color: #f2f2f2; 
               text-align: left; 
             }
+               img { 
+          width: 200px; 
+          height: 150px; 
+          object-fit: cover;
+        }
           </style>
         </head>
         <body>
@@ -463,6 +468,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
           ${stageTable} 
           <h3>Inventory specification</h3>
           ${inventorySpecification}
+          <img src="${findStage === null || findStage === void 0 ? void 0 : findStage.image}" alt="Stage Image" />
         </body>
       </html>
     `;

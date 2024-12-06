@@ -554,6 +554,11 @@ export const generatePdf = async (req: Request, res: Response) => {
               background-color: #f2f2f2; 
               text-align: left; 
             }
+               img { 
+          width: 200px; 
+          height: 150px; 
+          object-fit: cover;
+        }
           </style>
         </head>
         <body>
@@ -563,6 +568,7 @@ export const generatePdf = async (req: Request, res: Response) => {
           ${stageTable} 
           <h3>Inventory specification</h3>
           ${inventorySpecification}
+          <img src="${findStage?.image}" alt="Stage Image" />
         </body>
       </html>
     `;

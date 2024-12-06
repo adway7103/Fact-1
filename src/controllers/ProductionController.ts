@@ -324,8 +324,7 @@ export const generatePdf = async (req: Request, res: Response) => {
             ? formatDate(production.updatedAt)
             : "-"
         }</p>
-              <img src="${production.image}" alt="Production Image" />
-
+         <img src="${production.image}" alt="Production Image" />
       </body>
     </html>
   `;

@@ -284,8 +284,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
         <p>Delivery Date: ${production.markAsDone === true
             ? formatDate(production.updatedAt)
             : "-"}</p>
-              <img src="${production.image}" alt="Production Image" />
-
+         <img src="${production.image}" alt="Production Image" />
       </body>
     </html>
   `;
