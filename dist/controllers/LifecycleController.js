@@ -240,7 +240,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
 // Function to start a new stage
 export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, } = req.body;
+    let { stage, expectedDeliveryDate, assignTo, name, contact, price, additionalInformation, image, } = req.body;
     try {
         const lifecycle = yield Lifecycle.findById(id);
         if (!lifecycle) {
@@ -307,6 +307,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             contact,
             isCompleted: false,
             additionalInformation: additionalInformation ? additionalInformation : "",
+            image,
         };
         const updatedLifecycle = yield Lifecycle.findByIdAndUpdate(id, { $push: { stages: newStage } }, { new: true });
         res.locals.createdDocument = updateLifecycle;

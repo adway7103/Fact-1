@@ -64,4 +64,8 @@ export const StageDetailsSchema = new mongoose.Schema({
         type: Number,
         required: false,
     },
+    image: {
+        type: String,
+        required: false,
+    },
 });

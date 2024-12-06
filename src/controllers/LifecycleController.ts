@@ -303,6 +303,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
     contact,
     price,
     additionalInformation,
+    image,
   } = req.body;
 
   try {
@@ -378,6 +379,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       contact,
       isCompleted: false,
       additionalInformation: additionalInformation ? additionalInformation : "",
+      image,
     };
 
     const updatedLifecycle = await Lifecycle.findByIdAndUpdate(

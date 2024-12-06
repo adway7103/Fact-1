@@ -26,6 +26,7 @@ export interface StageDetails {
   isCompleted: boolean;
   additionalInformation?: string;
   lostPieces?: number;
+  image?: string;
 }
 
 //define StageDetailsSchema schema
@@ -78,6 +79,10 @@ export const StageDetailsSchema = new mongoose.Schema<StageDetails>({
   },
   lostPieces: {
     type: Number,
+    required: false,
+  },
+  image: {
+    type: String,
     required: false,
   },
 });
