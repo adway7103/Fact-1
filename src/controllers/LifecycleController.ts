@@ -568,7 +568,11 @@ export const generatePdf = async (req: Request, res: Response) => {
           ${stageTable} 
           <h3>Inventory specification</h3>
           ${inventorySpecification}
-  ${findStage?.image ? `<img src="${findStage.image}" alt="Stage Image" />` : ""}  
+  ${
+    findStage?.image
+      ? `<img src="${findStage.image}" alt="Stage Image" />`
+      : `<p></p>`
+  }  
     </body>
       </html>
     `;

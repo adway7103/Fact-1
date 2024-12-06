@@ -468,7 +468,7 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
           ${stageTable} 
           <h3>Inventory specification</h3>
           ${inventorySpecification}
- ${(findStage === null || findStage === void 0 ? void 0 : findStage.image) && `<img src="${findStage.image}" alt="Stage Image" />`}     
+  ${(findStage === null || findStage === void 0 ? void 0 : findStage.image) ? `<img src="${findStage.image}" alt="Stage Image" />` : ""}  
     </body>
       </html>
     `;
