@@ -468,8 +468,8 @@ export const generatePdf = (req, res) => __awaiter(void 0, void 0, void 0, funct
           ${stageTable} 
           <h3>Inventory specification</h3>
           ${inventorySpecification}
-          <img src="${findStage === null || findStage === void 0 ? void 0 : findStage.image}" alt="Stage Image" />
-        </body>
+ ${(findStage === null || findStage === void 0 ? void 0 : findStage.image) && `<img src="${findStage.image}" alt="Stage Image" />`}     
+    </body>
       </html>
     `;
         // Convert HTML content to PDF
