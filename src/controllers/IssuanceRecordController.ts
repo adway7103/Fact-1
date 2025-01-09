@@ -162,8 +162,8 @@ export const fetchIssuanceRecords = async (req: Request, res: Response) => {
         (l) => l._id.toString() === issuance.lot?._id.toString()
       );
 
-      const stageDetails = lifecycle?.stages.find(
-        (stage) => stage._id.toString() === issuance.stage.toString()
+      const stageDetails: any = lifecycle?.stages.find(
+        (stage) => stage?._id.toString() === issuance.stage.toString()
       );
 
       return {
@@ -210,8 +210,8 @@ export const fetchIssuanceRecordsWithUserId = async (
         (l) => l._id.toString() === issuance.lot._id.toString()
       );
 
-      const stageDetails = lifecycle?.stages.find(
-        (stage) => stage._id.toString() === issuance.stage.toString()
+      const stageDetails: any = lifecycle?.stages.find(
+        (stage) => stage?._id.toString() === issuance.stage.toString()
       );
 
       return {
@@ -258,8 +258,8 @@ export const fetchIssuanceRecordsWitId = async (
         (l) => l._id.toString() === issuance.lot._id.toString()
       );
 
-      const stageDetails = lifecycle?.stages.find(
-        (stage) => stage._id.toString() === issuance.stage.toString()
+      const stageDetails: any = lifecycle?.stages.find(
+        (stage) => stage?._id.toString() === issuance.stage.toString()
       );
 
       return {

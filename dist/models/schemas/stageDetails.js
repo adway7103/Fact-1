@@ -1,23 +1,12 @@
 import mongoose from "mongoose";
 import "dotenv/config";
-//define stage enum
-export var StageEnum;
-(function (StageEnum) {
-    StageEnum["Karigar"] = "karigar";
-    StageEnum["Checking"] = "checking";
-    StageEnum["FeedOff"] = "feedoff";
-    StageEnum["Overlock"] = "overlock";
-    StageEnum["Side_Lupi"] = "side & lupi";
-    StageEnum["Belt"] = "belt";
-    StageEnum["Thoka_Bottom_Label"] = "thoka & bottom & label";
-    StageEnum["Final_Checking"] = "final checking";
-})(StageEnum || (StageEnum = {}));
 //define StageDetailsSchema schema
 export const StageDetailsSchema = new mongoose.Schema({
     stage: {
         type: String,
-        enum: Object.values(StageEnum),
-        default: StageEnum.Karigar,
+        default: "karigar",
+        // enum: Object.values(StageEnum),
+        // default: StageEnum.Karigar,
     },
     startTime: {
         type: Date,

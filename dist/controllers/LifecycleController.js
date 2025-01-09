@@ -217,7 +217,7 @@ export const updateLifecycle = (req, res) => __awaiter(void 0, void 0, void 0, f
         }
         stage.isCompleted = isCompleted;
         stage.lostPieces = Number(lostPieces);
-        if (markAsDone &&
+        if (markAsDone ||
             lifecycle.stages[lifecycle.stages.length - 1]._id.toString() === stageId) {
             lifecycle.markAsDone = true;
         }
@@ -250,7 +250,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             });
         }
         // Check if the stage already exists
-        const existingStage = lifecycle.stages.find((s) => s.stage.toLowerCase() === stage.toLowerCase());
+        const existingStage = lifecycle.stages.find((s) => s.stage.toString().toLowerCase() === stage.toLowerCase());
         if (existingStage) {
             return res.status(400).json({
                 success: false,
@@ -298,6 +298,7 @@ export const startLifecycleNewStage = (req, res) => __awaiter(void 0, void 0, vo
             });
         }
         const newStage = {
+            _id: new mongoose.Types.ObjectId(),
             stage: stage.toLowerCase(),
             startTime: new Date(),
             expectedDeliveryDate,

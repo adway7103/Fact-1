@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config";
-import {
-  StageDetailsSchema,
-  StageDetails,
-  StageEnum,
-} from "./schemas/stageDetails.js";
+import { StageDetailsSchema, StageDetails } from "./schemas/stageDetails.js";
 import {
   LifecycleDetailsSchema,
   LifeCycleDetails,

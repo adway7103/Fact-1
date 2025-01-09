@@ -145,7 +145,7 @@ export const fetchIssuanceRecords = (req, res) => __awaiter(void 0, void 0, void
         const lifecycleRecords = yield Lifecycle.find({ _id: { $in: lotIds } });
         const issuanceWithStageDetails = issuanceRecords.map((issuance) => {
             const lifecycle = lifecycleRecords.find((l) => { var _a; return l._id.toString() === ((_a = issuance.lot) === null || _a === void 0 ? void 0 : _a._id.toString()); });
-            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => stage._id.toString() === issuance.stage.toString());
+            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => (stage === null || stage === void 0 ? void 0 : stage._id.toString()) === issuance.stage.toString());
             return Object.assign(Object.assign({}, issuance.toObject()), { stageDetails: stageDetails || null });
         });
         res.json({
@@ -178,7 +178,7 @@ export const fetchIssuanceRecordsWithUserId = (req, res) => __awaiter(void 0, vo
         const lifecycleRecords = yield Lifecycle.find({ _id: { $in: lotIds } });
         const issuanceWithStageDetails = issuanceRecord.map((issuance) => {
             const lifecycle = lifecycleRecords.find((l) => l._id.toString() === issuance.lot._id.toString());
-            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => stage._id.toString() === issuance.stage.toString());
+            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => (stage === null || stage === void 0 ? void 0 : stage._id.toString()) === issuance.stage.toString());
             return Object.assign(Object.assign({}, issuance.toObject()), { stageDetails: stageDetails || null });
         });
         res.json({
@@ -211,7 +211,7 @@ export const fetchIssuanceRecordsWitId = (req, res) => __awaiter(void 0, void 0,
         const lifecycleRecords = yield Lifecycle.find({ _id: { $in: lotIds } });
         const issuanceWithStageDetails = issuanceRecord.map((issuance) => {
             const lifecycle = lifecycleRecords.find((l) => l._id.toString() === issuance.lot._id.toString());
-            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => stage._id.toString() === issuance.stage.toString());
+            const stageDetails = lifecycle === null || lifecycle === void 0 ? void 0 : lifecycle.stages.find((stage) => (stage === null || stage === void 0 ? void 0 : stage._id.toString()) === issuance.stage.toString());
             return Object.assign(Object.assign({}, issuance.toObject()), { stageDetails: stageDetails || null });
         });
         res.json({

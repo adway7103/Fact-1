@@ -268,7 +268,7 @@ export const updateLifecycle = async (req: Request, res: Response) => {
     stage.lostPieces = Number(lostPieces);
 
     if (
-      markAsDone &&
+      markAsDone ||
       lifecycle.stages[lifecycle.stages.length - 1]._id.toString() === stageId
     ) {
       lifecycle.markAsDone = true;
@@ -317,7 +317,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
 
     // Check if the stage already exists
     const existingStage = lifecycle.stages.find(
-      (s) => s.stage.toLowerCase() === stage.toLowerCase()
+      (s) => s.stage.toString().toLowerCase() === stage.toLowerCase()
     );
 
     if (existingStage) {
@@ -370,6 +370,7 @@ export const startLifecycleNewStage = async (req: Request, res: Response) => {
       });
     }
     const newStage: StageDetails = {
+      _id: new mongoose.Types.ObjectId(),
       stage: stage.toLowerCase(),
       startTime: new Date(),
       expectedDeliveryDate,

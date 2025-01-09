@@ -2,21 +2,21 @@ import mongoose from "mongoose";
 import "dotenv/config";
 
 //define stage enum
-export enum StageEnum {
-  Karigar = "karigar",
-  Checking = "checking",
-  FeedOff = "feedoff",
-  Overlock = "overlock",
-  Side_Lupi = "side & lupi",
-  Belt = "belt",
-  Thoka_Bottom_Label = "thoka & bottom & label",
-  Final_Checking = "final checking",
-}
+// export enum StageEnum {
+//   Karigar = "karigar",
+//   Checking = "checking",
+//   FeedOff = "feedoff",
+//   Overlock = "overlock",
+//   Side_Lupi = "side & lupi",
+//   Belt = "belt",
+//   Thoka_Bottom_Label = "thoka & bottom & label",
+//   Final_Checking = "final checking",
+// }
 
 //define StageDetails interface
 export interface StageDetails {
   [x: string]: any;
-  stage: StageEnum;
+  stage: any;
   startTime: Date;
   endTime?: Date;
   expectedDeliveryDate: string;
@@ -33,8 +33,9 @@ export interface StageDetails {
 export const StageDetailsSchema = new mongoose.Schema<StageDetails>({
   stage: {
     type: String,
-    enum: Object.values(StageEnum),
-    default: StageEnum.Karigar,
+    default: "karigar",
+    // enum: Object.values(StageEnum),
+    // default: StageEnum.Karigar,
   },
   startTime: {
     type: Date,

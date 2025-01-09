@@ -10,10 +10,11 @@ import lifecycleRouter from "./routes/LifecycleRouter.js";
 import issuanceRouter from "./routes/IssuanceRecordRouter.js";
 import notificationRouter from "./routes/notificationRouter.js";
 import activityLogsRouter from "./routes/LogsRouter.js";
-import uploadRouter from "./routes/uploadRouter.js"
+import uploadRouter from "./routes/uploadRouter.js";
 import cors from "cors";
 import AddPermissions from "./controllers/Rules.js";
 // import roleRouter from "./routes/RoleRouter.js";
+import stageRouter from "./routes/StageRouter.js";
 import roleRouter from "./routes/RoleRouter.js";
 import { checkPermissions } from "./middleware/checkPermissions.js";
 import logMiddleware from "./middleware/logsMiddleware.js";
@@ -23,14 +24,15 @@ app.use(cors());
 // app.use(logMiddleware);
 
 app.use("/auth", authRouter);
+app.use("/", authenticate, stageRouter);
 app.use("/todo", authenticate, TodoRouter);
-app.use("/inventory",logMiddleware, authenticate, inventoryRouter);
-app.use("/production",logMiddleware, authenticate, productionRouter);
-app.use("/lifecycle",logMiddleware, authenticate, lifecycleRouter);
-app.use("/issuance",logMiddleware, authenticate, issuanceRouter);
+app.use("/inventory", logMiddleware, authenticate, inventoryRouter);
+app.use("/production", logMiddleware, authenticate, productionRouter);
+app.use("/lifecycle", logMiddleware, authenticate, lifecycleRouter);
+app.use("/issuance", logMiddleware, authenticate, issuanceRouter);
 app.use("/", authenticate, notificationRouter);
 app.use("/", authenticate, activityLogsRouter);
-app.use("/",authenticate, uploadRouter);
+app.use("/", authenticate, uploadRouter);
 // app.use("/role",authenticate,checkPermissions("add-role"), roleRouter);
 app.post("/role", AddPermissions);
 
