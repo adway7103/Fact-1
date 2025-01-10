@@ -2,8 +2,11 @@ import mongoose from "mongoose";
 import "dotenv/config";
 
 export enum UserType {
-  Admin = "admin",
-  Manager = "manager",
+  SuperAdmin = "SuperAdmin",
+  SuperManager = "SuperManager",
+  CuttingManager = "CuttingManager",
+  LifecycleManager = "LifecycleManager",
+  InventoryManager = "InventoryManager",
   Worker = "worker",
 }
 

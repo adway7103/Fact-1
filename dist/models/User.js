@@ -2,8 +2,11 @@ import mongoose from "mongoose";
 import "dotenv/config";
 export var UserType;
 (function (UserType) {
-    UserType["Admin"] = "admin";
-    UserType["Manager"] = "manager";
+    UserType["SuperAdmin"] = "SuperAdmin";
+    UserType["SuperManager"] = "SuperManager";
+    UserType["CuttingManager"] = "CuttingManager";
+    UserType["LifecycleManager"] = "LifecycleManager";
+    UserType["InventoryManager"] = "InventoryManager";
     UserType["Worker"] = "worker";
 })(UserType || (UserType = {}));
 const UserSchema = new mongoose.Schema({
