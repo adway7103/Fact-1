@@ -200,3 +200,26 @@ export const deleteItem = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return res.status(400).json({ message: "Error occured" });
     }
 });
+export const bulkUpdatePrice = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { sort_number, new_price } = req.body;
+        if (!sort_number || new_price === undefined) {
+            return res
+                .status(400)
+                .json({ error: "Please provide sort_number and new_price" });
+        }
+        // Update all items with the matching sort_number
+        const updatedItems = yield Inventory.updateMany({ "extra_fields.1.sort_number": sort_number }, { $set: { price: new_price } });
+        if (updatedItems.matchedCount === 0) {
+            return res
+                .status(404)
+                .json({ message: "No items found with the given sort_number" });
+        }
+        return res.status(200).json({
+            message: `Updated price for ${updatedItems.modifiedCount} items.`,
+        });
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+});

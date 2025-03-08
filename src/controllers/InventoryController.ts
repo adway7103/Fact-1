@@ -236,11 +236,40 @@ export const deleteItem = async (req: Request, res: Response) => {
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
-    
+
     res.locals.createdDocument = item;
 
     return res.status(200).json({ message: "Item deleted" });
   } catch (error: any) {
     return res.status(400).json({ message: "Error occured" });
+  }
+};
+export const bulkUpdatePrice = async (req: Request, res: Response) => {
+  try {
+    const { sort_number, new_price } = req.body;
+
+    if (!sort_number || new_price === undefined) {
+      return res
+        .status(400)
+        .json({ error: "Please provide sort_number and new_price" });
+    }
+
+    // Update all items with the matching sort_number
+    const updatedItems = await Inventory.updateMany(
+      { "extra_fields.1.sort_number": sort_number },
+      { $set: { price: new_price } }
+    );
+
+    if (updatedItems.matchedCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "No items found with the given sort_number" });
+    }
+
+    return res.status(200).json({
+      message: `Updated price for ${updatedItems.modifiedCount} items.`,
+    });
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
   }
 };
